@@ -1,0 +1,18 @@
+{% extends 'B2MainBundle::layout.html.twig' %}
+{% block title "- Result -" %}
+    {% block content %}
+
+        {% set cat = category|split('-') %}
+        {% set sub = subcategory|split('-') %}
+
+
+        <h3>You have successful complete the test for : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+
+        <p>You  have  {{ result.status }} </p>
+
+        <h3>Answer Sheet :</h3>
+        <hr>
+        {{ result.answerSheet|raw }}
+
+        <div><a href="{{ path('main_list') }}" class="sf-button sf-button-selected">Take another test</a></div>
+    {% endblock %}

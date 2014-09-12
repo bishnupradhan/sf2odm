@@ -1,0 +1,29 @@
+{% extends 'B2MainBundle::layout.html.twig' %}
+{#{% block title "- Login form -" %}#}
+    {% block content %}
+
+        {% set cat = category|split('-') %}
+        {% set sub = subcategory|split('-') %}
+
+
+        <h3>Set Question for the test : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+        <p>
+            Donec auctor turpis ligula, et sodales quam gravida quis. Maecenas dictum, urna vitae pretium fermentum, neque est pretium purus, at imperdiet lorem augue in erat. Morbi eu turpis sed lorem lacinia tincidunt. Curabitur pulvinar maximus urna elementum cursus. Aliquam quis lacinia est. Fusce sapien enim, egestas sed lobortis sit amet, semper sit amet dolor. Etiam tincidunt rhoncus pharetra.
+        </p>
+
+        <form action="{{ path('set_question') }}" method="post" autocomplete="off">
+            {#{{ include('B2MainBundle:QuestionType:comparenumber.html.twig') }}#}
+            <input type="hidden" name="QuestionSet[category]" value="{{ category }}" readonly="readonly" />
+            <input type="hidden" name="QuestionSet[subcategory]" value="{{ subcategory }} " readonly="readonly" />
+            <input type="hidden" name="QuestionSet[user]" value="{{ user }}" readonly="readonly" />
+            <input type="hidden" name="modelName" value="{{ modelName }}" readonly="readonly" />
+
+
+            <div><label for="QuestionSet_numQuestion">Number of Question</label>
+                <input type="text" id="QuestionSet_numQuestion" name="QuestionSet[numQuestion]" value=""/></div>
+            {{ include( 'B2MainBundle:QuestionType:'~ modelName ~'.html.twig') }}
+            <input type="submit" value="Set Question"/>
+        </form>
+
+
+    {% endblock %}

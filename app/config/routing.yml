@@ -1,0 +1,8 @@
+b2_account:
+    resource: "@B2AccountBundle/Resources/config/routing.yml"
+    prefix:   /
+
+b2_main:
+    resource: "@B2MainBundle/Resources/config/routing.yml"
+    prefix:   /
+

@@ -1,0 +1,34 @@
+_homepage:
+    path:     /
+    defaults: { _controller: B2MainBundle:Default:index }
+
+# cat/subcat listing
+main_list:
+    path:     /listing
+    defaults: { _controller: B2MainBundle:Default:listing }
+
+# Test page setting
+main_testType:
+   path:     /test/{cat}/{type}
+   defaults: { _controller: B2MainBundle:Test:setTesting }
+
+# Test page stored to different table
+set_question:
+   path:     /setQuestion
+   defaults: { _controller: B2MainBundle:Test:setQuestion }
+
+# start the test
+test_start:
+   path:     /test
+   defaults: { _controller: B2MainBundle:Test:test }
+
+# submit Answer
+answer_submit:
+    path:     /test/submit
+    defaults: { _controller: B2MainBundle:Test:submit }
+
+#evaluation
+#  path:     /test/evaluation
+
+#result
+# path : /result

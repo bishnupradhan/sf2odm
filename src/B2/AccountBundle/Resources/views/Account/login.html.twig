@@ -1,0 +1,10 @@
+{#
+<form action="{{ path('b2_account_create')}}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <input type="submit" />
+</form>#}
+{% extends 'B2MainBundle::layout.html.twig' %}
+{% block title "- Login form -" %}
+    {% block content %}
+        {{ form(form) }}
+    {% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'B2MainBundle::layout.html.twig' %}
+
+    {% block content %}
+
+        {% set cat = category|split('-') %}
+        {% set sub = subcategory|split('-') %}
+
+
+        <h3>Start the test for the test : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+        <p>
+            Curabitur sagittis rhoncus mi, malesuada mollis nulla sodales eu. In ipsum tellus, pellentesque vel justo nec, facilisis porta ante. Donec pellentesque nulla ipsum, sed lobortis purus molestie ac. Duis non ipsum nunc. In at cursus risus. Suspendisse commodo iaculis quam, porttitor imperdiet mauris bibendum nec.
+        </p>
+
+        <form action="{{ path('test_start') }}" method="post">
+
+            <input type="hidden" readonly="readonly" name="category" value="{{ category }}"/>
+            <input type="hidden" readonly="readonly" name="subcategory" value="{{ subcategory }}"/>
+            <input type="hidden" readonly="readonly" name="user" value="{{ user }}"/>
+            <input type="hidden" readonly="readonly" name="modelName" value="{{ modelName }}"/>
+            <input type="hidden" readonly="readonly" name="questionDocumentTypeID" value="{{ questionDocumentTypeID }}"/>
+
+            <input type="submit" value="Start"/>
+        </form>
+
+    {% endblock %}

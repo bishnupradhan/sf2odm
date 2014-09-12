@@ -1,0 +1,20 @@
+{% extends 'B2MainBundle::layout.html.twig' %}
+
+    {% block content %}
+
+        {% set cat = category|split('-') %}
+        {% set sub = subcategory|split('-') %}
+
+
+        <h3>Question Set : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+        <h3>Do as Directed : </h3>
+        <form action="{{ path('answer_submit') }}" method="post" autocomplete="off">
+            <input type="hidden" readonly="readonly" name="category" value="{{ category }}"/>
+            <input type="hidden" readonly="readonly" name="subcategory" value="{{ subcategory }}"/>
+            <input type="hidden" readonly="readonly" name="user" value="{{ user }}"/>
+
+            {{ classObjDisplay|raw }}
+            <input type="submit" value="Submit"/>
+        </form>
+
+    {% endblock %}

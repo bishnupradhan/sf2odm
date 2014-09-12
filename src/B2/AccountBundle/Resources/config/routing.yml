@@ -1,0 +1,11 @@
+account_register:
+    path:     /register
+    defaults: { _controller: B2AccountBundle:Account:register }
+
+account_login:
+    path:     /login
+    defaults: { _controller: B2AccountBundle:Account:login }
+
+b2_account_show:
+    path:     /account/show
+    defaults: { _controller: B2AccountBundle:Account:show }
