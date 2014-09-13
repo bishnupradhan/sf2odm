@@ -19,7 +19,9 @@
             <input type="hidden" name="modelName" value="{{ modelName }}" readonly="readonly" />
 
 
-            <div><label for="QuestionSet_numQuestion">Number of Question</label>
+            <div><label for="QuestionSet_numSheets">Number of Sheets</label>
+                <input type="text" id="QuestionSet_numSheets" name="QuestionSet[numSheets]" value=""/></div>
+            <div><label for="QuestionSet_numQuestion">Number of Question per Sheet</label>
                 <input type="text" id="QuestionSet_numQuestion" name="QuestionSet[numQuestion]" value=""/></div>
             {{ include( 'B2MainBundle:QuestionType:'~ modelName ~'.html.twig') }}
             <input type="submit" value="Set Question"/>

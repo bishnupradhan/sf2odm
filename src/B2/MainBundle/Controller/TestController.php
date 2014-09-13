@@ -85,7 +85,8 @@ class TestController extends Controller
             $questionType = new $qDoc();
 
             $questionType->setUserTestDocumentId($userTestId);
-            $questionType->setNumberQuestions($_REQUEST['QuestionSet']['numQuestion']);
+            $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
+            $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
             $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
             $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
 
@@ -117,11 +118,13 @@ class TestController extends Controller
      * - leads to corresponding question model view with generated questions
      * @return mixed
      */
-    public function testAction(){
-        //print "<pre>";print_r($_REQUEST);print "</pre>";exit;
+    public function testAction( $questionSheetIndex = 0,$questionObjID = ''){
+        //print "<pre>";print_r($_REQUEST);print "</pre>";//exit;
 
-        //$modelName = "q".$_REQUEST['modelName'];
-        $questionDocumentTypeID = $_REQUEST['questionDocumentTypeID'];
+        //$questionSheetIndex = isset($_REQUEST['numSheets']) && !empty($_REQUEST['numSheets']) ? $_REQUEST['numSheets'] : 0;
+        $questionSheetIndex = $questionSheetIndex ? $questionSheetIndex : 0;
+
+        $questionDocumentTypeID = !empty($questionObjID) ? $questionObjID : $_REQUEST['questionDocumentTypeID'];
 
 
         $dm = $this->get('doctrine_mongodb')->getManager();
@@ -130,30 +133,58 @@ class TestController extends Controller
         $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
         $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
         $bundle = 'B2MainBundle:'."Q".$qClassType;
-
+//echo $bundle;
         $qb = $dm->createQueryBuilder($bundle)
             ->hydrate(false)
             ->field('id')->equals($questionDocumentTypeID);
         $query = $qb->getQuery();
         $questionStructure = $query->getSingleResult();
 
-        /*print "<pre>";var_dump($questionStructure);print "</pre>";exit;*/
+        //print "<pre>";var_dump($questionStructure);print "</pre>";exit;
+        //$questionSheetIndex = $questionSheetIndex ? $questionSheetIndex++ : $questionStructure['numSheets'];
 
         /////////////////////////////////////////////////////////
+        if($questionSheetIndex < $questionStructure['numSheets']){  // go for next question set
 
-        $questionObject = new  $qDoc($questionStructure['_id']);
+            //echo "11111";exit;
 
-        //return $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
-        $classObjDisplay = $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
 
-        return $this->render('B2MainBundle:Test:_display.html.twig',
-            array(
-                'category'=>$_REQUEST['category'],
-                'subcategory'=>$_REQUEST['subcategory'],
-                'user'=>$_REQUEST['user'],
-                'classObjDisplay'=> $classObjDisplay
-            ));
+            $questionObject = new  $qDoc($questionStructure['_id']);
 
+            //return $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
+            $classObjDisplay = $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
+            //echo $classObjDisplay;exit;
+
+            return $this->render('B2MainBundle:Test:_display.html.twig',
+                array(
+                    'category'=>$_REQUEST['category'],
+                    'subcategory'=>$_REQUEST['subcategory'],
+                    'user'=>$_REQUEST['user'],
+                    'classObjDisplay'=> $classObjDisplay,
+                    'questionSheetIndex'=>$questionSheetIndex
+                ));
+        }else{ // go for evaluation
+
+            //echo "2222222222";exit;
+
+            $clsType = $_REQUEST['questionClassName'];
+
+            $explodedClass = explode('\\', $clsType);
+            $answerClassType = $explodedClass[3];
+
+            $questionClass = substr($answerClassType,1);
+            $result = $this->collectAllQuestionAttemptData($_REQUEST['questionObjID'],$_REQUEST['user'],$questionClass);
+
+            return $this->render('B2MainBundle:Test:_result.html.twig',
+                array('result'=> $result,
+                    'questionClassType'=>$questionClass,
+                    'answerObjID'=>$_REQUEST['answerObjID'],
+                    'category'=>$_REQUEST['category'],
+                    'subcategory'=>$_REQUEST['subcategory'],
+                    'user'=>$_REQUEST['user'],
+                )
+            );
+        }
     }
 
     protected function processByQuestionClassType($classObject, $mongoObject, $classType) {
@@ -176,7 +207,7 @@ class TestController extends Controller
     //************************** Create Question for indivisual question type Strats*******************************//
     public function processQCompareNumber($classObject, $mongoObject,$dm){
         $classObject->setUserTestDocumentId($mongoObject['userTestDocumentId']);
-        $classObject->setNumberQuestions($mongoObject['numQuestions']);
+        $classObject->setNumQuestions($mongoObject['numQuestions']);
         $classObject->setNumberMin($mongoObject['numberMin']);
         $classObject->setNumberMax($mongoObject['numberMax']);
         $classObject->create_questions($dm);
@@ -202,7 +233,7 @@ class TestController extends Controller
      * @return Response
      */
     public function submitAction(){
-        //print "<pre>";print_r($_REQUEST);print "</pre>";exit;
+        //print "<pre>Submition : ";print_r($_REQUEST);print "</pre>";exit;
         $clsType = $_REQUEST['questionClassName'];
 
         $explodedClass = explode('\\', $clsType);
@@ -212,7 +243,17 @@ class TestController extends Controller
 
         $funcName = "processA".$questionClass;
 
-        $scoreWithAnsSheet = $this->$funcName();    // answer submission and calculate the score with answersheet
+        $res = $this->$funcName();
+        //var_dump($res);
+        if(!empty($res)){ // go for next sheet
+            $res = (int) $res;
+            return $this->testAction($res,$_REQUEST['questionObjID']);
+        }else{  // error
+            echo "Some error while data insertion";
+            exit;
+        }
+
+        /*$scoreWithAnsSheet = $this->$funcName();    // answer submission and calculate the score with answersheet
 
         return $this->render('B2MainBundle:Test:_result.html.twig',
             array('result'=> $scoreWithAnsSheet,
@@ -222,7 +263,7 @@ class TestController extends Controller
                 'subcategory'=>$_REQUEST['subcategory'],
                 'user'=>$_REQUEST['user'],
             )
-        );
+        );*/
     }
 
 
@@ -251,20 +292,34 @@ class TestController extends Controller
         //var_dump($arr);
         $dm->persist($studentAnswerObject);
         $dm->flush();
+
+        $generatedID = $studentAnswerObject->getID();
+        //var_dump($generatedID);
+        //echo $_REQUEST['questionSheetIndex']."<hr>";
+        if(!empty($generatedID)){   // go for next question sheet
+            $indx = (int) $_REQUEST['questionSheetIndex'];      //////////////////////// increment the index
+
+            return ++$indx;
+        }else{
+            echo "Some Error in record insertion";
+            return false;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////
         //echo $studentAnswerObject->getID();
         //echo "<hr/>";//exit;
-        $function = "Q".ltrim (__FUNCTION__,'processA');
-        $res = $this->actionEvaluate($studentAnswerObject->getID(), $function); // to be return
+        /*$function = "Q".ltrim (__FUNCTION__,'processA');
+        $res = $this->actionEvaluate($studentAnswerObject->getID(), $function);*/ // to be return
         //echo $res."<hr/>";//exit;
         ///////////////////////////// go for answer sheet  //////////////////////////////////
 
-        $studentMongoArray = array('classType'=>'CompareNumber',
+        /*$studentMongoArray = array('classType'=>'CompareNumber',
             'studentAnswerMongoID'=>$studentAnswerObject->getID(),
             'answerObjectID'=>$studentAnswerObject->getAnswerObjectID());
         $html = $this->getAnswerHtmlDumpForEach($studentMongoArray);
 
         $result = array('status'=>$res,'answerSheet'=>$html);
-        return $result;
+        return $result;*/
 
 
     }
@@ -347,6 +402,44 @@ class TestController extends Controller
         $obj->setArray($studentMongoArray);
         $obj->processMongoResult($dm);
         return ($obj->getHtmlDump());
+    }
+
+    protected  function collectAllQuestionAttemptData($questionObjID,$user,$questionClass){
+        //$classType = ltrim ($questionClass,'Q');
+        $answerDocumentClass = 'A'.$questionClass;
+        $bundle = 'B2MainBundle:';
+
+        $dm = $this->get('doctrine_mongodb')->getManager();
+        $document =  $bundle.$answerDocumentClass;
+
+        $qBuilder = $dm->createQueryBuilder($document )
+            ->hydrate(false)
+            ->select("answerObjectId")
+            ->field('questionDocumentId')->equals($questionObjID)
+            ->field('user')->equals($user);
+        $mongoQuery = $qBuilder->getQuery();
+        $userAnswerArray = $mongoQuery->execute();
+        print "<pre>";
+        var_dump($userAnswerArray);
+        print "</pre>";
+        exit;
+
+        // go for evaluation
+        $result = array();
+        foreach($userAnswerArray as $eachAnswerIndex){
+            var_dump($eachAnswerIndex);
+            /*$result[$indx]['status'] =  $this->actionEvaluate($eachAnswerIndex['answerObjID'],$questionClass);
+
+            // answer sheet
+            $studentMongoArray = array('classType'=>ltrim ($questionClass,'Q'),
+                                        'studentAnswerMongoID'=>$eachAnswerIndex['id'],
+                                        'answerObjectID'=>$eachAnswerIndex['answerObjID']);
+            $result[$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);*/
+        }
+        exit;
+
+        return $result;
+
     }
 
 

@@ -24,6 +24,12 @@ abstract class Question {
      */
     protected $numQuestions;
 
+    /**
+     * @MongoDB\Int
+     * @Assert\NotBlank()
+     */
+    protected $numSheets;
+
 
     abstract public function render();
 
@@ -41,14 +47,26 @@ abstract class Question {
         return $this->userTestDocumentId;
     }
 
-    public function setNumberQuestions($numQuestions){
+    public function setNumQuestions($numQuestions)
+    {
         $this->numQuestions = $numQuestions;
-
     }
 
-    public function getNumberQuestions(){
+    public function getNumQuestions()
+    {
         return $this->numQuestions;
     }
+
+    public function setNumSheets($numSheets)
+    {
+        $this->numSheets = $numSheets;
+    }
+
+    public function getNumSheets()
+    {
+        return $this->numSheets;
+    }
+
 
 
 
