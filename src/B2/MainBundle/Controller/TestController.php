@@ -10,17 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use B2\MainBundle\Document;
-use B2\MainBundle\Model;    // to be removed
 use B2\MainBundle\AnswerSheet;
-
-use B2\MainBundle\Document\Category;
-use B2\MainBundle\Document\UserTest;
 
 class TestController extends Controller
 {
 
     /**
-     * This is for setting the question model type. which leads to coresponding question model view.
+     * This is for setting the question model type. which leads to corresponding question model view.
      * @param $cat      // category
      * @param $type     // subcat or question type
      * @return Response
@@ -36,7 +32,7 @@ class TestController extends Controller
 
         $Qtype = '\B2\MainBundle\Document\\'.$qDoc;
         $modelName = strtolower($this->getProperFormat($type));
-        $user = 'Bishnu';
+        $user = 'Bishnu';   // todo: user name to be fetch from session
 
         $questionType = new $Qtype();
         /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
@@ -53,7 +49,7 @@ class TestController extends Controller
     }
 
     /**
-     * This set the UserTest and Coresponding question type model (q type).
+     * This set the UserTest and Corresponding question type model (q type).
      * And leads to 'start the practice' view
      * @return Response
      */
@@ -71,7 +67,7 @@ class TestController extends Controller
         $userTest->setCategory($_REQUEST['QuestionSet']['category']);
         $userTest->setSubcategory($_REQUEST['QuestionSet']['subcategory']);
         $userTest->setDateTime(date("Y-m-d H:m:s"));
-        $userTest->setIp("192.168.1.100");
+        $userTest->setIp($this->container->get('request')->getClientIp());
         $userTest->setIsTestComplete("0");
 
         $dm->persist($userTest);
@@ -81,11 +77,10 @@ class TestController extends Controller
 
         if(!empty($userTestId)){
             // go for indivisual test setting
-            $modelName = $_REQUEST['modelName'];
+            $modelName = trim($_REQUEST['modelName']);
 
             //echo $this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);exit;
             $qDoc = '\B2\MainBundle\Document\\'."Q".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
-            //echo $qDoc;exit;
 
             $questionType = new $qDoc();
 
@@ -117,9 +112,9 @@ class TestController extends Controller
 
 
     /**
-     * After confirmation from user to satrt the test.
-     * - prepare the question and set into system answer into Coresponding question type model (a type).
-     * - leads to corresponging question model view with generated questions
+     * After confirmation from user to start the test.
+     * - prepare the question and set into system answer into Corresponding question type model (a type).
+     * - leads to corresponding question model view with generated questions
      * @return mixed
      */
     public function testAction(){
@@ -132,7 +127,7 @@ class TestController extends Controller
         $dm = $this->get('doctrine_mongodb')->getManager();
 
 
-        $qClassType = $this->getProperFormat($_REQUEST['subcategory']);
+        $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
         $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
         $bundle = 'B2MainBundle:'."Q".$qClassType;
 
@@ -174,7 +169,7 @@ class TestController extends Controller
         foreach($qDoc as $v){
             $qType .= ucfirst($v);
         }
-        return $qType;
+        return trim($qType);
     }
 
 
