@@ -11,7 +11,7 @@ class ACompareNumber  {
     protected $id;
 
     /** @ODM\ObjectId */
-    protected $userTestDocumentId; //Mongo Object ID of Different Type of Question
+    protected $questionDocumentId; //Mongo Object ID of Different Type of Question
 
     /** @ODM\String */
     protected $user;
@@ -23,8 +23,8 @@ class ACompareNumber  {
     protected $answerObjectId;
 
 
-    public function __construct($userTestDocumentId=null, $user='system'){
-        $this->userTestDocumentId = $userTestDocumentId;
+    public function __construct($questionDocumentId=null, $user='system'){
+        $this->questionDocumentId = $questionDocumentId;
         $this->user = $user;
     }
 
@@ -33,12 +33,12 @@ class ACompareNumber  {
         return $this->id;
     }
 
-    public function getUserTestDocumentId(){
-        return $this->userTestDocumentId;
+    public function getQuestionDocumentId(){
+        return $this->questionDocumentId;
     }
 
-    public function setUserTestDocumentId($userTestDocumentId){
-        $this->userTestDocumentId = $userTestDocumentId;
+    public function setQuestionDocumentId($questionDocumentId){
+        $this->questionDocumentId = $questionDocumentId;
     }
 
     public function getUser(){
