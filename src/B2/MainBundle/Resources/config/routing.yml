@@ -14,7 +14,7 @@ main_testType:
 
 # Test page stored to different table
 set_question:
-   path:     /setQuestion
+   path:     /test/start
    defaults: { _controller: B2MainBundle:Test:setQuestion }
 
 # start the test

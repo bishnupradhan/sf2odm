@@ -8,11 +8,15 @@
 
         <h3>You have successful complete the test for : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
 
-        <p>You  have  {{ result.status }} </p>
+        {% for index in result %}
 
-        <h3>Answer Sheet :</h3>
-        <hr>
-        {{ result.answerSheet|raw }}
+            <h3>Question No . {{ loop.index }}</h3>
+            <p>You  have  {{ index.status }} </p>
+
+            <h4>Answer Sheet :</h4>
+            {{ index.answerSheet|raw }}
+            <hr>
+        {% endfor %}
 
         <div><a href="{{ path('main_list') }}" class="sf-button sf-button-selected">Take another test</a></div>
     {% endblock %}

@@ -2,6 +2,9 @@
 
 namespace B2\MainBundle\Controller;
 
+use Doctrine\DBAL\Types\ObjectType;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\ObjectId;
+use Doctrine\ODM\MongoDB\Types\ObjectIdType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 /*use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;*/
@@ -274,7 +277,7 @@ class TestController extends Controller
         $studentAnswerObject = new \B2\MainBundle\Document\ACompareNumber($_REQUEST['questionObjID']);
         $studentAnswerObject->setAnswerObjectID($_REQUEST['answerObjID']);
         //todo: change this to be dynamic depending upon the student giving the test
-        $studentAnswerObject->setUser('TestUser');
+        $studentAnswerObject->setUser('Bishnu');
         foreach($_REQUEST['cmpInput'] as $answerKey=>$answerValue){
             switch($answerValue){
                 case '<': $compareValue = '&#60;';
@@ -405,38 +408,41 @@ class TestController extends Controller
     }
 
     protected  function collectAllQuestionAttemptData($questionObjID,$user,$questionClass){
-        //$classType = ltrim ($questionClass,'Q');
+
         $answerDocumentClass = 'A'.$questionClass;
         $bundle = 'B2MainBundle:';
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $document =  $bundle.$answerDocumentClass;
 
+        $questionObjID = new \MongoId($questionObjID);
+
         $qBuilder = $dm->createQueryBuilder($document )
             ->hydrate(false)
-            ->select("answerObjectId")
+            //->select("answerObjectId")
             ->field('questionDocumentId')->equals($questionObjID)
             ->field('user')->equals($user);
         $mongoQuery = $qBuilder->getQuery();
         $userAnswerArray = $mongoQuery->execute();
-        print "<pre>";
-        var_dump($userAnswerArray);
-        print "</pre>";
-        exit;
 
         // go for evaluation
         $result = array();
+        $indx = 0;
         foreach($userAnswerArray as $eachAnswerIndex){
-            var_dump($eachAnswerIndex);
-            /*$result[$indx]['status'] =  $this->actionEvaluate($eachAnswerIndex['answerObjID'],$questionClass);
+
+            $curObjId = (array)$eachAnswerIndex['_id'];
+            $ansObjId = (array)$eachAnswerIndex['answerObjectId'];
+
+            $result[$indx]['status'] =  $this->actionEvaluate($curObjId['$id'],$questionClass);
 
             // answer sheet
             $studentMongoArray = array('classType'=>ltrim ($questionClass,'Q'),
-                                        'studentAnswerMongoID'=>$eachAnswerIndex['id'],
-                                        'answerObjectID'=>$eachAnswerIndex['answerObjID']);
-            $result[$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);*/
+                                        'studentAnswerMongoID'=>$curObjId['$id'],
+                                        'answerObjectID'=>$ansObjId['$id']);
+            $result[$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);
+            $indx++;
         }
-        exit;
+        //print "<pre>";print_r($result);print "</pre>";exit;
 
         return $result;
 
