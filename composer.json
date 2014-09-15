@@ -6,6 +6,30 @@
     "autoload": {
         "psr-0": { "": "src/", "SymfonyStandard": "app/" }
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "jquery/jquery",
+                "version": "1.11.1",
+                "dist": {
+                    "url": "http://code.jquery.com/jquery-1.11.1.js",
+                    "type": "file"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "fontawesome/fontawesome",
+                "version": "4.2.0",
+                "dist": {
+                    "url": "http://fortawesome.github.io/Font-Awesome/assets/font-awesome-4.2.0.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ],
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": "2.5.*",
@@ -20,7 +44,10 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "doctrine/mongodb-odm": "1.0.*@dev",
         "doctrine/mongodb-odm-bundle": "3.0.*@dev",
-        "doctrine/doctrine-fixtures-bundle": "2.2.*"
+        "doctrine/doctrine-fixtures-bundle": "2.2.*",
+        "twbs/bootstrap": "3.0.*",
+        "jquery/jquery":  "1.11.1",
+        "fontawesome/fontawesome": "4.2.0"
 
     },
     "require-dev": {

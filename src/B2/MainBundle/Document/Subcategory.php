@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
- * @MongoDB\Document
+ * @MongoDB\EmbeddedDocument
  */
 class Subcategory
 {

@@ -29,10 +29,10 @@ class Category
     protected $category;
 
     /**
-     * @MongoDB\Field(type="collection")
+     * @MongoDB\EmbedMany(targetDocument="Subcategory")
      * @Assert\NotBlank()
      */
-    protected $sub;
+    protected $sub = array();
 
 
 
@@ -67,17 +67,12 @@ class Category
         return $this->id;
     }
 
-    /**
-     * @param mixed $sub
-     */
-    public function setSub($sub)
+    public function setSub(Subcategory $sub)
     {
-        $this->sub = $sub;
+        $this->sub[] = $sub;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getSub()
     {
         return $this->sub;
