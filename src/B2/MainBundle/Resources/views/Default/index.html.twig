@@ -2,18 +2,40 @@
 
 {% block title %}Welcome{% endblock %}
 
-{% block content_header '' %}
     {% block content %}
-        {% set version = constant('Symfony\\Component\\HttpKernel\\Kernel::MAJOR_VERSION') ~ '.' ~ constant('Symfony\\Component\\HttpKernel\\Kernel::MINOR_VERSION')%}
+        <div class="jumbotron">
+            <h1>Hello, world!</h1>
+            <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+            <p><a href="#" class="btn btn-primary btn-lg" role="button">Learn more &raquo;</a></p>
+        </div>
 
-        <h1 class="title">Welcome!</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    {#<img class="img-circle" src="{{ asset('images/welcome-demo.gif') }}" alt=Login"/>#}
 
-        <p>You are in the home page.</p>
+                    <h2><i class="fa fa-sign-in"></i> Login</h2>
+
+                    <p><a class="btn btn-default" href="{{ path('account_login') }}" role="button">Login &raquo;</a></p>
+                </div>
+                <div class="col-md-4">
+                    <h2><i class="fa fa-paypal"></i> Register</h2>
+                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                    <p><a class="btn btn-default" href="{{ path('account_register') }}" role="button">Register &raquo;</a></p>
+                </div>
+                <div class="col-md-4">
+                    <h2><i class="fa fa-futbol-o"></i> Start Test</h2>
+                    <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                    <p><a class="btn btn-default" href="{{ path('main_list') }}" role="button">Start &raquo;</a></p>
+                </div>
+            </div>
+        </div>
+
 
         <div class="symfony-blocks-welcome">
             <div class="block-quick-tour">
                 <div class="illustration">
-                    <img src="{{ asset('images/welcome-demo.gif') }}" alt=Login" />
+
                 </div>
                 <a href="{{ path('account_login') }}" class="sf-button sf-button-selected">
                 <span class="border-l">
@@ -24,22 +46,22 @@
                 </a>
             </div>
             {#{% if app.environment == 'dev' %}#}
-                <div class="block-configure">
-                    <div class="illustration">
-                        <img src="{{ asset('images/welcome-configure.gif') }}" alt="Registration" />
-                    </div>
-                    <a href="{{ path('account_register') }}" class="sf-button sf-button-selected">
+            <div class="block-configure">
+                <div class="illustration">
+                    <img src="{{ asset('images/welcome-configure.gif') }}" alt="Registration"/>
+                </div>
+                <a href="{{ path('account_register') }}" class="sf-button sf-button-selected">
                     <span class="border-l">
                         <span class="border-r">
                             <span class="btn-bg">Register</span>
                         </span>
                     </span>
-                    </a>
-                </div>
-           {# {% endif %}#}
+                </a>
+            </div>
+            {# {% endif %}#}
             <div class="block-configure">
                 <div class="illustration">
-                    <img src="{{ asset('images/welcome-configure.gif') }}" alt="Test Listing" />
+                    <img src="{{ asset('images/welcome-configure.gif') }}" alt="Test Listing"/>
                 </div>
                 <a href="{{ path('main_list') }}" class="sf-button sf-button-selected">
                     <span class="border-l">
@@ -51,4 +73,4 @@
             </div>
         </div>
 
-{% endblock %}
+    {% endblock %}

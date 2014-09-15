@@ -64,10 +64,10 @@ class AccountController extends Controller
     {
         $dm = $this->get('doctrine_mongodb')->getManager();
         $user = new LoginForm();
-        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_login'),))
+        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_login'), 'attr'=>array('class'=>'form-signin')))
             ->add('email', 'email')
             ->add('password', 'password')
-            ->add('save', 'submit', array('label' => 'Login'))
+            ->add('save', 'submit', array('label' => 'Login', 'attr' => array('class' => '')))
             ->getForm();
 
         $form->handleRequest($request);

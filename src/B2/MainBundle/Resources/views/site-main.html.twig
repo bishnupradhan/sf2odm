@@ -1,64 +1,67 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
-        <meta name="robots" content="noindex,nofollow" />
+        <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
-        {#<link href="{{ asset('bundles/framework/css/structure.css', absolute=true) }}" rel="stylesheet" type="text/css" media="all" />
-        <link href="{{ asset('bundles/framework/css/body.css', absolute=true) }}" rel="stylesheet" type="text/css" media="all" />#}
+        <link rel="icon" sizes="16x16" href="{{ asset('newfav.ico') }}" />
         {% block head %}{% endblock %}
+        {#{% stylesheets 'css/bootstrap.css' %}
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}"/>
+        {% endstylesheets %}#}
+        {% block stylesheets %}
+
+            {% stylesheets 'css/style.css' combine=true %}
+            <link href="{{ asset_url }}" type="text/css" rel="stylesheet">
+            {% endstylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/fontawesome.css') }}">
+        {% endblock %}
     </head>
-    <body>
-        <div id="content">
-            <div class="header clear-fix">
-                <div class="header-logo">
-                    <img src="{{ asset('logo_48x48.png') }}" alt="UMP" title="UMP" />
+    <body role="document">
+    {% block fixedNavBar %}
+        <!-- Fixed navbar -->
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Practice</a>
                 </div>
-                <div class="head-title"><strong>Unlimited Online Practice</strong></div>
-
-
-                <div class="search">
-                    <a href="{{ path('account_login') }}" class="sf-button sf-button-selected">
-                        <span class="border-l">
-                            <span class="border-r">
-                                <span class="btn-bg">Login</span>
-                            </span>
-                        </span>
-                    </a>
-                    <a href="{{ path('account_register') }}" class="sf-button sf-button-selected">
-                        <span class="border-l">
-                            <span class="border-r">
-                                <span class="btn-bg">Register</span>
-                            </span>
-                        </span>
-                    </a>
-
-
-
-
-                    {#<form method="get" action="http://symfony.com/search" target="_blank">
-                        <div class="form-row">
-                            <label for="search-id">
-                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAABUElEQVQoz2NgAIJ29iBdD0d7X2cPb+tY2f9MDMjgP2O2hKu7vS8CBlisZUNSMJ3fxRMkXO61wm2ue6I3iB1q8Z8ZriDZFCS03fm/wX+1/xp/TBo8QPxeqf+MUAW+QIFKj/+q/wX/c/3n/i/6Qd/bx943z/Q/K1SBI1D9fKv/AhCn/Wf5L5EHdFGKw39OqAIXoPpOMziX4T9/DFBBnuN/HqhAEtCKCNf/XDA/rZRyAmrpsvrPDVUw3wrkqCiLaewg6TohX1d7X0ffs5r/OaAKfinmgt3t4ulr4+Xg4ANip3j+l/zPArNT4LNOD0pAgWCSOUIBy3+h/+pXbBa5tni0eMx23+/mB1YSYnENroT5Pw/QSOX/mkCo+l/jgo0v2KJA643s8PgAmsMBDCbu/5xALHPB2husxN9uCzsDOgAq5kAoaZVnYMCh5Ky1r88Eh/+iABM8jUk7ClYIAAAAAElFTkSuQmCC" alt="Search on Symfony website" />
-                            </label>
-
-                            <input name="q" id="search-id" type="search" placeholder="Search on Symfony website" />
-
-                            <button type="submit" class="sf-button">
-                                <span class="border-l">
-                                    <span class="border-r">
-                                        <span class="btn-bg">OK</span>
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
-                   </form>#}
-                </div>
-            </div>
-
-            <div class="sf-reset">
-                {% block body %}{% endblock %}
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Nav header</li>
+                                <li><a href="#">Separated link</a></li>
+                                <li><a href="#">One more separated link</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
             </div>
         </div>
+    {% endblock %}
+    <div class="container theme-showcase" role="main">
+    {% block body %}{% endblock %}
+    </div>
+
+    {% block javascripts %}
+
+        {% javascripts '@jquery_js' '@bootstrap_js' combine=true %}
+        <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+
+    {% endblock %}
     </body>
 </html>

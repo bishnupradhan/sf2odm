@@ -6,5 +6,29 @@
 {% extends 'B2MainBundle::layout.html.twig' %}
 {% block title "- Login form -" %}
     {% block content %}
-        {{ form(form) }}
+<div class="container">
+        {#{{ form(form) }}#}
+<div class="login-form">
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div class="">
+        {{ form_label(form.email) }}
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email, { 'attr': {'class': 'form-control'} }) }}
+    </div>
+
+    <div class="">
+        {{ form_label(form.password) }}
+        {{ form_errors(form.password) }}
+        {{ form_widget(form.password, { 'attr': {'class': 'form-control'} }) }}
+    </div>
+
+    <div class="">
+        {{ form_label(form.save) }}
+        {{ form_widget(form.save, { 'attr': {'class': 'btn btn-lg btn-primary btn-block'} }) }}
+    </div>
+
+    {{ form_end(form) }}
+</div>
+    </div>
     {% endblock %}
