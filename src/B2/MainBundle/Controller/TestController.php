@@ -369,23 +369,16 @@ class TestController extends Controller
             $classTypeName = '\B2\MainBundle\Document\\'.$answerDocumentClass;
             $evalObj = new $classTypeName();
             if($answerDocumentClass == 'AIncremental') {
-                $evalScore = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers'], $systemAnswerArray['preFilledIndexes']);
+                $evalArray = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers'], $systemAnswerArray['preFilledIndexes']);
             }
             elseif($answerDocumentClass== 'AFractionEquivalent'){
-                $evalScore = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers'], $systemAnswerArray['maxEquivalents']);
+                $evalArray = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers'], $systemAnswerArray['maxEquivalents']);
 
             }
             else {
-                $evalScore = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers']);
+                $evalArray = $evalObj->evaluation($systemAnswerArray['answers'], $studentAnswerArray['answers']);
             }
-            if($evalScore >= 75){
-                $msg = "Pass with ".$evalScore."%";
-            }
-            else {
-                $msg = "Fail with ".$evalScore."%";
-            }
-
-            return $msg;
+            return $evalArray;
 
         }else{
             // to be redirect
@@ -433,15 +426,50 @@ class TestController extends Controller
             $curObjId = (array)$eachAnswerIndex['_id'];
             $ansObjId = (array)$eachAnswerIndex['answerObjectId'];
 
-            $result[$indx]['status'] =  $this->actionEvaluate($curObjId['$id'],$questionClass);
+            $result['report'][$indx]['status'] =  $this->actionEvaluate($curObjId['$id'],$questionClass);
 
             // answer sheet
             $studentMongoArray = array('classType'=>ltrim ($questionClass,'Q'),
                                         'studentAnswerMongoID'=>$curObjId['$id'],
                                         'answerObjectID'=>$ansObjId['$id']);
-            $result[$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);
+            $result['report'][$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);
             $indx++;
         }
+
+        // evaluation summery report
+        $totalQuestionAsked = $totalCorrectAnswer = $overAllPercentage = $totalPreFilled =  $totalNotAttendQuestion = 0;
+        foreach($result['report']  as $inx=>$eachAnswerSheet){
+            $totalQuestionAsked += (int) $eachAnswerSheet['status']['totalQuestion'];
+            $totalCorrectAnswer += (int) $eachAnswerSheet['status']['correctAnswer'];
+            $totalPreFilled += (int) $eachAnswerSheet['status']['preFilled'];
+            $totalNotAttendQuestion += (int) $eachAnswerSheet['status']['notAttendQuestion'];
+        }
+        $overAllPercentage = number_format(((float)round($totalCorrectAnswer/($totalQuestionAsked-$totalPreFilled),2) * 100), 2, '.', '');
+
+        // todo : to be configured
+        if((float)$overAllPercentage >= 95.00){
+            $msg = "Hurry !! You have scored outstanding.";
+        }elseif((float)$overAllPercentage < 95.00 && (float)$overAllPercentage >= 80.00) {
+            $msg = "Best";
+        }elseif((float)$overAllPercentage < 80.00 && (float)$overAllPercentage >= 70.00) {
+            $msg = "Good";
+        }elseif((float)$overAllPercentage < 70.00 && (float)$overAllPercentage >= 60.00) {
+            $msg = "Average";
+        }elseif((float)$overAllPercentage < 60.00 && (float)$overAllPercentage >= 50.00) {
+            $msg = "Poor";
+        }else{
+            $msg = "Failed";
+        }
+
+        $result['summery'] = array(
+            "totalQuestionAsked" => $totalQuestionAsked,
+            "totalCorrectAnswer" => $totalCorrectAnswer,
+            "totalPreFilled" => $totalPreFilled,
+            "totalNotAttendQuestion" => $totalNotAttendQuestion,
+            "overAllPercentage" => $overAllPercentage,
+            "message"=>$msg
+        );
+
         //print "<pre>";print_r($result);print "</pre>";exit;
 
         return $result;

@@ -73,7 +73,7 @@ class ACompareNumber  {
          //var_dump($systemAnswers);
          //var_dump($studentAnswers);
         $actualAnswers = sizeof($systemAnswers[0]);
-        $correctAnswer = 0;
+        $correctAnswer = $notAttendQuestion = 0;
         foreach($systemAnswers as $sysAnswerK=>$sysAnswerV){
 
             foreach($sysAnswerV as $k=>$v){
@@ -85,14 +85,26 @@ class ACompareNumber  {
                     if($v['compareValue'] === $studentAnswers[$sysAnswerK][$k]['compareValue']){
                         $correctAnswer++;
                     }
+                    if(empty($studentAnswers[$sysAnswerK][$k]['compareValue'])){
+                        $notAttendQuestion++;
+                    }
                     /* echo $v['compareValue'] , 'H';
                      echo $studentAnswers[$sysAnswerK][$k]['compareValue'] . "  ==  ";*/
                 }
             }
             //var_dump($actualAnswers);
             //var_dump($correctAnswer);
-            $scoredPercentage = (($correctAnswer/$actualAnswers) * 100);
-            return $scoredPercentage;
+            $scoredPercentage = number_format(((float)($correctAnswer/$actualAnswers) * 100), 2, '.', '');
+
+            // result summery array formation
+            $result = array(
+                "totalQuestion"=>sizeof($systemAnswers[0]),
+                "correctAnswer"=>$correctAnswer,
+                "preFilled"=>1,
+                "scoredPercentage"=>$scoredPercentage,
+                "notAttendQuestion"=>$notAttendQuestion
+            );
+            return $result;
         }
 
 

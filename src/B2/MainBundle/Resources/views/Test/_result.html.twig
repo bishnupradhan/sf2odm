@@ -6,12 +6,27 @@
         {% set sub = subcategory|split('-') %}
 
 
-        <h3>You have successful complete the test for : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+        <h4>You have successful complete the test for : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h4>
 
-        {% for index in result %}
+        <h3>Test Summery :</h3>
+        <p>Total Question Asked : {{ result.summery.totalQuestionAsked }}</p>
+        <p>Pre Filled Answers: {{ result.summery.totalPreFilled }}</p>
+        <p>Total Answer Correct : {{ result.summery.totalCorrectAnswer }}</p>
+        <p>Question Not Attend : {{ result.summery.totalNotAttendQuestion }}</p>
+        <p>Overall Percentage : <b>{{ result.summery.overAllPercentage }}%</b></p>
+        <p>Remark : {{ result.summery.message }}</p>
 
-            <h3>Question No . {{ loop.index }}</h3>
-            <p>You  have  {{ index.status }} </p>
+        <hr/><hr/>
+
+
+        {% for index in result.report %}
+
+            <h3>Question Work Sheet No. {{ loop.index }}</h3>
+            <p>Question Asked : {{ index.status.totalQuestion }}</p>
+            <p>Pre Filled Answers: {{ index.status.preFilled }}</p>
+            <p>Answer Correct : {{ index.status.correctAnswer }}</p>
+            <p>Question Not Attend : {{ index.status.notAttendQuestion }}</p>
+            <p>Percentage : <b>{{ index.status.scoredPercentage }}%</b></p>
 
             <h4>Answer Sheet :</h4>
             {{ index.answerSheet|raw }}
