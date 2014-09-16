@@ -1,11 +1,38 @@
-{#
-<form action="{{ path('b2_account_create')}}" method="post" {{ form_enctype(form) }}>
-    {{ form_widget(form) }}
-    <input type="submit" />
-</form>#}
 {% extends 'B2MainBundle::layout.html.twig' %}
 {% block title "- Registration form -" %}
 
     {% block content %}
-        {{ form(form) }}
+<div class="container">
+        {#{{ form(form) }}#}
+    {{ form_start(form) }}
+    <h2 class="form-signin-heading">Registration</h2>
+    {{ form_errors(form) }}
+    <div class="form-element">
+        {{ form_errors(form.firstName) }}
+        {{ form_widget(form.firstName, { 'attr': {'class': 'form-control', 'placeholder':'First Name'} }) }}
+    </div>
+    <div class="form-element">
+        {{ form_errors(form.lastName) }}
+        {{ form_widget(form.lastName, { 'attr': {'class': 'form-control', 'placeholder':'Last Name'} }) }}
+    </div>
+    <div class="form-element">
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email, { 'attr': {'class': 'form-control', 'placeholder':'Email address'} }) }}
+    </div>
+    <div class="form-element">
+        {{ form_errors(form.password.password) }}
+        {{ form_widget(form.password.password, { 'attr': {'class': 'form-control', 'placeholder':'Password'} }) }}
+    </div>
+    <div class="form-element">
+        {{ form_errors(form.password.confirm) }}
+        {{ form_widget(form.password.confirm, { 'attr': {'class': 'form-control', 'placeholder':'Confirm Password'} }) }}
+    </div>
+    <div class="form-element">
+        {{ form_label(form.save) }}
+        {{ form_widget(form.save, { 'attr': {'class': 'btn btn-lg btn-primary btn-block'} }) }}
+    </div>
+
+    {{ form_end(form) }}
+
+    </div>
     {% endblock %}

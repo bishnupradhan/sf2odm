@@ -19,8 +19,16 @@ class User
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/[0-9]/", match=false, message="First name cannot contain numbers.")
      */
-    protected $name;
+    protected $firstName;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/[0-9]/", match=false, message="First name cannot contain numbers.")
+     */
+    protected $lastName;
 
     /**
      * @MongoDB\Field(type="string")
@@ -32,6 +40,9 @@ class User
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/", match=true, message="Minimum length
+    should be 8 Characters. Password     should contain at least 1 Uppercase letter, 1 Lowercase Letter, 1 Number and
+    1 Special Character. ")
      */
     protected $password;
 
@@ -40,15 +51,26 @@ class User
         return $this->id;
     }
 
-    public function getName()
+    public function getFirstName()
     {
-        return $this->name;
+        return $this->firstName;
     }
 
-    public function setName($name)
+    public function setFirstName($firstName)
     {
-        $this->name = $name;
+        $this->firstName = $firstName;
     }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
 
     public function getEmail()
     {

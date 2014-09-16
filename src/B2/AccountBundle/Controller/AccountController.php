@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 use B2\AccountBundle\Document\User;
 use B2\AccountBundle\Document\LoginForm;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 
 
@@ -22,11 +24,20 @@ class AccountController extends Controller
         print "</pre>";*/
         $dm = $this->get('doctrine_mongodb')->getManager();
         $user = new User();
-        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_register'),))
-            ->add('name', 'text')
+        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_register'),
+            'attr'=>array('class'=>'form-signin')))
+            ->add('firstName', 'text', array(
+        'constraints' => new Length(array('min' => 3)),
+    ))
+            ->add('lastName', 'text')
             ->add('email', 'email')
-            ->add('password', 'password')
-            ->add('save', 'submit', array('label' => 'Create'))
+            ->add('password', 'repeated', array(
+                'first_name' => 'password',
+                'second_name' => 'confirm',
+                'type' => 'password',
+                'invalid_message' => 'The password fields must match.',
+            ))
+            ->add('save', 'submit', array('label' => 'Register'))
             ->getForm();
 
         $form->handleRequest($request);
@@ -64,7 +75,8 @@ class AccountController extends Controller
     {
         $dm = $this->get('doctrine_mongodb')->getManager();
         $user = new LoginForm();
-        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_login'), 'attr'=>array('class'=>'form-signin')))
+        $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_login'),
+            'attr'=>array('class'=>'form-signin')))
             ->add('email', 'email')
             ->add('password', 'password')
             ->add('save', 'submit', array('label' => 'Login', 'attr' => array('class' => '')))

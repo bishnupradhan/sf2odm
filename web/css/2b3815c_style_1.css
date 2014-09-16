@@ -5959,3 +5959,17 @@ td.visible-print {
   padding: 15px;
   margin: 0 auto;
 }
+.form-signin .form-element {
+  padding-top: 15px;
+}
+.form-signin .form-element ul {
+  padding-left: 0px;
+}
+.form-signin .form-element ul li {
+  list-style: none;
+  color: #d9534f;
+  font-size: 11px;
+}
+.login-form {
+  padding: 20px;
+}
