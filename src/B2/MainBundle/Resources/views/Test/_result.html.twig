@@ -1,37 +1,64 @@
 {% extends 'B2MainBundle::layout.html.twig' %}
 {% block title "- Result -" %}
     {% block content %}
-
+        <div class="container">
+            <div class="result-summary">
         {% set cat = category|split('-') %}
         {% set sub = subcategory|split('-') %}
 
-
+        <div class="alert alert-success" role="alert">
         <h4>You have successful complete the test for : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h4>
-
-        <h3>Test Summery :</h3>
+        </div>
+        <div class="test-summary">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+        <h3>Test Summary :</h3>
+                </div>
+                <div class="panel-body">
         <p>Total Question Asked : {{ result.summery.totalQuestionAsked }}</p>
         <p>Pre Filled Answers: {{ result.summery.totalPreFilled }}</p>
         <p>Total Answer Correct : {{ result.summery.totalCorrectAnswer }}</p>
         <p>Question Not Attend : {{ result.summery.totalNotAttendQuestion }}</p>
         <p>Overall Percentage : <b>{{ result.summery.overAllPercentage }}%</b></p>
         <p>Remark : {{ result.summery.message }}</p>
-
-        <hr/><hr/>
-
-
+                    </div>
+                </div>
+        </div>
+        <div class="worksheet-summary">
         {% for index in result.report %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+            <h4>Question Work Sheet No. {{ loop.index }}</h4>
+                </div>
+                <div class="panel-body">
+            <p>
+                    <h4>
 
-            <h3>Question Work Sheet No. {{ loop.index }}</h3>
-            <p>Question Asked : {{ index.status.totalQuestion }}</p>
-            <p>Pre Filled Answers: {{ index.status.preFilled }}</p>
+                        <span class="label label-success">Question Asked: </span>
+                        <span class="badge"> {{ index.status.totalQuestion }}</span>
+                    </h4>
+            </p>
+            <p>
+                <h4>
+                        <span class="label label-primary">Pre Filled Answers: </span>
+                        <span class="badge"> {{ index.status.preFilled }}</span>
+                </h4>
+                        </p>
             <p>Answer Correct : {{ index.status.correctAnswer }}</p>
             <p>Question Not Attend : {{ index.status.notAttendQuestion }}</p>
             <p>Percentage : <b>{{ index.status.scoredPercentage }}%</b></p>
 
             <h4>Answer Sheet :</h4>
+            <div class="answer-sheet">
             {{ index.answerSheet|raw }}
-            <hr>
-        {% endfor %}
+            </div>
+                    </div>
+                </div>
 
+        {% endfor %}
+        </div>
+        </div>
+            <div class="clearfix"></div>
         <div><a href="{{ path('main_list') }}" class="sf-button sf-button-selected">Take another test</a></div>
+        </div>
     {% endblock %}

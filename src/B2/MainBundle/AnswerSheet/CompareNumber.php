@@ -75,7 +75,8 @@ class CompareNumber {
             $htmlStr = '';
             $htmlStr .= "<div class='sheet-form-panel'>";
 
-            $symbol = ($this->processArray['CorrectAnswer'][$k] === $this->processArray['StudentAnswer'][$k]['compareValue']) ? "icon-ok" : "icon-remove";
+            $symbol = ($this->processArray['CorrectAnswer'][$k] === $this->processArray['StudentAnswer'][$k]['compareValue']) ? 'fa fa-check' : 'fa fa-times';
+
             $correctAnswer = ($this->processArray['CorrectAnswer'][$k] === $this->processArray['StudentAnswer'][$k]['compareValue']) ? "" : "<div class='correctAns'> Correct Answer - ".$this->processArray['CorrectAnswer'][$k]."</div>";
 
             $htmlStr .= "<div class='questionOne'>"
@@ -86,7 +87,7 @@ class CompareNumber {
                 ."<span> " . $v['secondNumber'] . " </span>"
                 ."</div>"
                 ."</div>"
-                ."<div class='symbol'><i class=".$symbol."></i></div>".$correctAnswer."<div class='cl'></div>"."<div class='cl'></div>";
+                ."<div class='symbol'><i class='".$symbol."'></i></div>".$correctAnswer."<div class='cl'></div>"."<div class='cl'></div>";
             $html .= $htmlStr;
         }
 

@@ -1,6 +1,7 @@
 {% extends 'B2MainBundle::layout.html.twig' %}
 
     {% block content %}
+        <div class="container">
 
         {% set cat = category|split('-') %}
         {% set sub = subcategory|split('-') %}
@@ -21,5 +22,5 @@
 
             <input type="submit" value="Start"/>
         </form>
-
+        </div>
     {% endblock %}

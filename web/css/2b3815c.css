@@ -5984,3 +5984,16 @@ td.visible-print {
 .login-form {
   padding: 20px;
 }
+.result-summary {
+  padding: 20px;
+}
+.worksheet-summary {
+  margin: 0px auto;
+  width: 100%;
+  padding-left: 40px;
+}
+.worksheet-summary .panel-default {
+  width: 500px;
+  float: left;
+  margin: 0 10px 10px 0px;
+}
