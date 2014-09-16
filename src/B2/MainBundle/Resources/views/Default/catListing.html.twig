@@ -1,0 +1,26 @@
+{% extends 'B2MainBundle::layout.html.twig' %}
+{% block title %}{{ data.categoryName|e }} - Listing{% endblock %}
+    {% block content %}
+        <div class="container">
+            <p>&nbsp;</p>
+            <h1>{{ data.categoryName|e }} Content :</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer blandit enim mattis iaculis molestie. Proin in nibh rhoncus, accumsan sapien accumsan, viverra ipsum. Proin mauris libero, posuere at enim nec, rutrum consectetur est. Ut semper ipsum in velit lacinia malesuada. Cras tempor bibendum ante, eu consectetur ipsum hendrerit quis. Proin sollicitudin bibendum urna. Suspendisse molestie est vel euismod rhoncus. Aliquam sit amet ante nec magna volutpat dapibus vitae eu risus.</p>
+
+            <p>In vel purus ornare, aliquam diam id, viverra est. Phasellus in ornare eros. In finibus felis orci, sed maximus tellus vulputate et. Curabitur sagittis rhoncus mi, malesuada mollis nulla sodales eu. In ipsum tellus, pellentesque vel justo nec, facilisis porta ante. Donec pellentesque nulla ipsum, sed lobortis purus molestie ac. Duis non ipsum nunc. In at cursus risus. Suspendisse commodo iaculis quam, porttitor imperdiet mauris bibendum nec. Praesent sagittis viverra volutpat. Curabitur quis aliquam erat. Nunc orci purus, mattis sed consectetur eu, condimentum vel arcu. Sed porta ut sem ac mollis. Sed luctus aliquet ex, in accumsan felis tincidunt vel. Nulla facilisi. Morbi vestibulum egestas est sed facilisis.</p>
+
+
+            <h3>Select Any From List - </h3>
+            <div class="panel-group">
+                <div class="panel-body">
+                    {% for subcat in data.sub %}
+                        <div class="list-group">
+                            <a href="{{ url('_homepage') }}test/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        <div><a href="{{ path('main_list') }}" class="sf-button sf-button-selected">All Category List</a></div>
+    {% endblock %}

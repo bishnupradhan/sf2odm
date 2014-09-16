@@ -33,7 +33,24 @@ class DefaultController extends Controller
         return $this->render('B2MainBundle:Default:listing.html.twig',array('data' => $cat));
     }
 
+    public function catListingAction($cat){
 
+        $dm = $this->get('doctrine_mongodb')->getManager();
+
+        $qb = $dm->createQueryBuilder("B2MainBundle:Category")
+            ->hydrate(false)
+            ->field('category')->equals(strtolower(trim($cat)));
+        $query = $qb->getQuery();
+        $getCategoryContent = $query->getSingleResult();
+
+        if(!empty($getCategoryContent)){
+            return $this->render('B2MainBundle:Default:catListing.html.twig',array('data' => $getCategoryContent));
+        }else{
+            $this->get('session')->getFlashBag()->add( 'error','No matching category found. Please select from the list once again.');
+            return $this->redirect($this->generateUrl("main_list"));
+        }
+
+    }
 
 }
 

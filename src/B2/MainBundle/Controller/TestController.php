@@ -113,12 +113,24 @@ class TestController extends Controller
                         'questionDocumentTypeID'=>$questionTypeId
                     ));
             }else{
-                $this->get('session')->getFlashBag()->add( 'error','Error in data insertion.');
-                return $this->redirect($this->generateUrl("main_list"));
+                $this->get('session')->getFlashBag()->add( 'error','Error in data insertion. Please re-structure the question.');
+                // removing test id from UserTest document
+                $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
+                    ->findAndRemove()
+                    ->field('id')->equals($userTestId)
+                    ->getQuery()
+                    ->execute();
+
+                // go to question setting page
+                $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
+                //return $this->redirect($this->generateUrl("main_list"));
             }
         }else{
-            $this->get('session')->getFlashBag()->add( 'error','Error in test id generation.');
-            return $this->redirect($this->generateUrl("main_list"));
+            $this->get('session')->getFlashBag()->add( 'error','Error in test id generation. Please re-structure the question.');
+
+            // go to question setting page
+            $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
+            //return $this->redirect($this->generateUrl("main_list"));
         }
     }
 
@@ -144,7 +156,7 @@ class TestController extends Controller
         $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
         $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
         $bundle = 'B2MainBundle:'."Q".$qClassType;
-//echo $bundle;
+
         $qb = $dm->createQueryBuilder($bundle)
             ->hydrate(false)
             ->field('id')->equals($questionDocumentTypeID);
@@ -152,13 +164,9 @@ class TestController extends Controller
         $questionStructure = $query->getSingleResult();
 
         //print "<pre>";var_dump($questionStructure);print "</pre>";exit;
-        //$questionSheetIndex = $questionSheetIndex ? $questionSheetIndex++ : $questionStructure['numSheets'];
 
         /////////////////////////////////////////////////////////
         if($questionSheetIndex < $questionStructure['numSheets']){  // go for next question set
-
-            //echo "11111";exit;
-
 
             $questionObject = new  $qDoc($questionStructure['_id']);
 
@@ -214,25 +222,6 @@ class TestController extends Controller
                     'user'=>$_REQUEST['user'],
                 )
             );
-
-
-            /*$clsType = $_REQUEST['questionClassName'];
-
-            $explodedClass = explode('\\', $clsType);
-            $answerClassType = $explodedClass[3];
-
-            $questionClass = substr($answerClassType,1);
-            $result = $this->collectAllQuestionAttemptData($_REQUEST['questionObjID'],$_REQUEST['user'],$questionClass);
-
-            return $this->render('B2MainBundle:Test:_result.html.twig',
-                array('result'=> $result,
-                    'questionClassType'=>$questionClass,
-                    'answerObjID'=>$_REQUEST['answerObjID'],
-                    'category'=>$_REQUEST['category'],
-                    'subcategory'=>$_REQUEST['subcategory'],
-                    'user'=>$_REQUEST['user'],
-                )
-            );*/
         }
     }
 
@@ -488,8 +477,8 @@ class TestController extends Controller
 
             // answer sheet
             $studentMongoArray = array('classType'=>ltrim ($questionClass,'Q'),
-                                        'studentAnswerMongoID'=>$curObjId['$id'],
-                                        'answerObjectID'=>$ansObjId['$id']);
+                'studentAnswerMongoID'=>$curObjId['$id'],
+                'answerObjectID'=>$ansObjId['$id']);
             $result['report'][$indx]['answerSheet']  = $this->getAnswerHtmlDumpForEach($studentMongoArray);
             $indx++;
         }
