@@ -25,7 +25,7 @@ class AccountController extends Controller
         $dm = $this->get('doctrine_mongodb')->getManager();
         $user = new User();
         $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_register'),
-            'attr'=>array('class'=>'form-signin')))
+            'attr'=>array('class'=>'form-signin', 'autocomplete'=>'off')))
             ->add('firstName', 'text', array(
         'constraints' => new Length(array('min' => 3)),
     ))
@@ -76,7 +76,7 @@ class AccountController extends Controller
         $dm = $this->get('doctrine_mongodb')->getManager();
         $user = new LoginForm();
         $form = $this->createFormBuilder($user,array('action' => $this->generateUrl('account_login'),
-            'attr'=>array('class'=>'form-signin')))
+            'attr'=>array('class'=>'form-signin', 'autocomplete'=>'off')))
             ->add('email', 'email')
             ->add('password', 'password')
             ->add('save', 'submit', array('label' => 'Login', 'attr' => array('class' => '')))
