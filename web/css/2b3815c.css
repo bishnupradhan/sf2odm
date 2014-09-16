@@ -5970,6 +5970,17 @@ td.visible-print {
   color: #d9534f;
   font-size: 11px;
 }
+.form-question-set {
+  max-width: 500px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-question-set .form-element {
+  padding-top: 15px;
+}
+.form-question-set input[type='submit'] {
+  width: 150px;
+}
 .login-form {
   padding: 20px;
 }
