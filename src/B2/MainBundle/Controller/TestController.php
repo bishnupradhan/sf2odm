@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 /*use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;*/
 
+use Symfony\Component\Finder\Finder;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -29,26 +31,30 @@ class TestController extends Controller
 
         $qDoc = "Q".$this->getProperFormat($type);
 
-        $repository = $this->get('doctrine_mongodb')
-            ->getManager()
-            ->getRepository('B2MainBundle:Category');
+        // check if file exits in that location
+        if($this->checkDocumentModelExits($qDoc)){
+            $repository = $this->get('doctrine_mongodb')
+                ->getManager()
+                ->getRepository('B2MainBundle:Category');
 
-        $Qtype = '\B2\MainBundle\Document\\'.$qDoc;
-        $modelName = strtolower($this->getProperFormat($type));
-        $user = 'Bishnu';   // todo: user name to be fetch from session
+            $Qtype = '\B2\MainBundle\Document\\'.$qDoc;
+            $modelName = strtolower($this->getProperFormat($type));
+            $user = 'Bishnu';   // todo: user name to be fetch from session
 
-        $questionType = new $Qtype();
-        /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
-        return $this->render('B2MainBundle:Test:setTesting.html.twig',
-            array(
-                'questionType' => $questionType,
-                'modelName'=>$modelName,
-                'category'=>$cat,
-                'subcategory'=>$type,
-                'user'=>$user
-            ));
-
-
+            $questionType = new $Qtype();
+            /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
+            return $this->render('B2MainBundle:Test:setTesting.html.twig',
+                array(
+                    'questionType' => $questionType,
+                    'modelName'=>$modelName,
+                    'category'=>$cat,
+                    'subcategory'=>$type,
+                    'user'=>$user
+                ));
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','No test type found. Please try another.');
+            return $this->redirect($this->generateUrl("main_list"));
+        }
     }
 
     /**
@@ -107,10 +113,12 @@ class TestController extends Controller
                         'questionDocumentTypeID'=>$questionTypeId
                     ));
             }else{
-                echo "not insert to questionType db";exit;
+                $this->get('session')->getFlashBag()->add( 'error','Error in data insertion.');
+                return $this->redirect($this->generateUrl("main_list"));
             }
         }else{
-            echo "not insert to userTest db";exit;
+            $this->get('session')->getFlashBag()->add( 'error','Error in test id generation.');
+            return $this->redirect($this->generateUrl("main_list"));
         }
     }
 
@@ -166,11 +174,27 @@ class TestController extends Controller
                     'classObjDisplay'=> $classObjDisplay,
                     'questionSheetIndex'=>$questionSheetIndex
                 ));
-        }else{ // go for evaluation
-
-            //echo "2222222222";exit;
-
+        }else{ // go for complete/thanks page
             $clsType = $_REQUEST['questionClassName'];
+
+            $explodedClass = explode('\\', $clsType);
+            $answerClassType = $explodedClass[3];
+
+            $questionClass = substr($answerClassType,1);
+
+            return $this->render('B2MainBundle:Test:testComplete.html.twig',
+                array(
+                    'questionClassType'=>$questionClass,
+                    'questionObjID'=>$_REQUEST['questionObjID'],
+                    'answerObjID'=>$_REQUEST['answerObjID'],
+                    'category'=>$_REQUEST['category'],
+                    'subcategory'=>$_REQUEST['subcategory'],
+                    'user'=>$_REQUEST['user'],
+                )
+            );
+
+
+            /*$clsType = $_REQUEST['questionClassName'];
 
             $explodedClass = explode('\\', $clsType);
             $answerClassType = $explodedClass[3];
@@ -186,8 +210,23 @@ class TestController extends Controller
                     'subcategory'=>$_REQUEST['subcategory'],
                     'user'=>$_REQUEST['user'],
                 )
-            );
+            );*/
         }
+    }
+
+    public function resultAction(){
+        $questionClass = $_REQUEST['questionClassType'];
+        $result = $this->collectAllQuestionAttemptData($_REQUEST['questionObjID'],$_REQUEST['user'],$questionClass);
+
+        return $this->render('B2MainBundle:Test:_result.html.twig',
+            array('result'=> $result,
+                'questionClassType'=>$questionClass,
+                'answerObjID'=>$_REQUEST['answerObjID'],
+                'category'=>$_REQUEST['category'],
+                'subcategory'=>$_REQUEST['subcategory'],
+                'user'=>$_REQUEST['user'],
+            )
+        );
     }
 
     protected function processByQuestionClassType($classObject, $mongoObject, $classType) {
@@ -198,12 +237,23 @@ class TestController extends Controller
 
     // making proper format
     protected function getProperFormat($arg){
-        $qDoc = explode("-",$arg);
+        $qDoc = explode("-",strtolower(trim($arg)));
         $qType = '';
         foreach($qDoc as $v){
             $qType .= ucfirst($v);
         }
         return trim($qType);
+    }
+
+    // checking in the Document directory for file exits
+    protected function checkDocumentModelExits($qDoc){
+        $finder = new Finder();
+        $finder->files()->in(__DIR__."\..\Document\\");
+        $fileName = array();
+        foreach ($finder as $file) {
+            $fileName[]= trim($file->getFilename(),".php");
+        }
+        return in_array($qDoc,$fileName) ? true :false ;
     }
 
 
@@ -215,9 +265,6 @@ class TestController extends Controller
         $classObject->setNumberMax($mongoObject['numberMax']);
         $classObject->create_questions($dm);
 
-        /*return $this->render('B2MainBundle:Test:_display.html.twig',
-            array('classObjDisplay'=> $classObject->render())
-        );*/
         return $classObject->render();
     }
 
@@ -256,17 +303,6 @@ class TestController extends Controller
             exit;
         }
 
-        /*$scoreWithAnsSheet = $this->$funcName();    // answer submission and calculate the score with answersheet
-
-        return $this->render('B2MainBundle:Test:_result.html.twig',
-            array('result'=> $scoreWithAnsSheet,
-                'questionClassType'=>$questionClass,
-                'answerObjID'=>$_REQUEST['answerObjID'],
-                'category'=>$_REQUEST['category'],
-                'subcategory'=>$_REQUEST['subcategory'],
-                'user'=>$_REQUEST['user'],
-            )
-        );*/
     }
 
 
@@ -381,8 +417,8 @@ class TestController extends Controller
             return $evalArray;
 
         }else{
-            // to be redirect
-            echo "No answer id selected";exit;
+            $this->get('session')->getFlashBag()->add( 'error','No answer id selected.');
+            return $this->redirect($this->generateUrl("main_list"));
         }
     }
 

@@ -26,6 +26,10 @@ test_start:
 answer_submit:
     path:     /test/submit
     defaults: { _controller: B2MainBundle:Test:submit }
+# test over
+test_over:
+    path:     /test/result
+    defaults: { _controller: B2MainBundle:Test:result }
 
 #evaluation
 #  path:     /test/evaluation
