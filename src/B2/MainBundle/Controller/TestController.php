@@ -182,6 +182,28 @@ class TestController extends Controller
 
             $questionClass = substr($answerClassType,1);
 
+            // get user_test id
+            $dm = $this->get('doctrine_mongodb')->getManager();
+
+            $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
+            $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
+            $bundle = 'B2MainBundle:'."Q".$qClassType;
+
+            $qb = $dm->createQueryBuilder($bundle)
+                ->hydrate(false)
+                ->field('id')->equals($questionDocumentTypeID);
+            $query = $qb->getQuery();
+            $questionStructure = $query->getSingleResult();
+
+
+            // updating isTestComplete flag
+            $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
+                ->findAndUpdate()
+                ->field('id')->equals($questionStructure['userTestDocumentId'])
+                ->field('isTestComplete')->set(true)
+                ->getQuery()
+                ->execute();
+
             return $this->render('B2MainBundle:Test:testComplete.html.twig',
                 array(
                     'questionClassType'=>$questionClass,
