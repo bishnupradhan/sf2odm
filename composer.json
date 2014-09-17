@@ -47,7 +47,9 @@
         "doctrine/doctrine-fixtures-bundle": "2.2.*",
         "twbs/bootstrap": "3.0.*",
         "jquery/jquery":  "1.11.1",
-        "fontawesome/fontawesome": "4.2.0"
+        "fontawesome/fontawesome": "4.2.0",
+        "friendsofsymfony/user-bundle": "~2.0@dev",
+        "hwi/oauth-bundle": "0.4.*@dev"
 
     },
     "require-dev": {

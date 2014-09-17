@@ -1,7 +1,12 @@
 parameters:
 #    b2_account.example.class: B2\AccountBundle\Example
 
-services:
+# services:
 #    b2_account.example:
 #        class: %b2_account.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+services:
+    b2_user.registration.form.type:
+        class: B2\AccountBundle\Form\Type\RegistrationFormType
+        tags:
+            - { name: form.type, alias: b2_user_registration }

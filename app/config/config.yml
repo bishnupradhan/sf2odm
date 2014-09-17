@@ -1,10 +1,11 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
+    - { resource: @B2AccountBundle/Resources/config/services.yml }
 
 framework:
     #esi:             ~
-    #translator:      { fallback: "%locale%" }
+    translator:      { fallback: "%locale%" }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -135,3 +136,11 @@ services:
     twig.extension.debug:
         class: Twig_Extension_Debug
         tags: [{ name: 'twig.extension' }]
+
+fos_user:
+    db_driver: mongodb # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: B2\AccountBundle\Document\User
+    registration:
+        form:
+            type: b2_user_registration
