@@ -14,7 +14,7 @@
                 <div class="panel-body">
                     {% for subcat in data.sub %}
                         <div class="list-group">
-                            <a href="{{ url('_homepage') }}test/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                            <a href="{{ url('_homepage') }}show/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
                         </div>
                     {% endfor %}
                 </div>

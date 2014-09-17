@@ -9,13 +9,15 @@ main_list:
 
 # Category page listing
 main_catType:
-  path:     /test/{cat}/
+  path:     /show/{cat}{optionalSlash}
   defaults: { _controller: B2MainBundle:Default:catListing }
+  requirements: { optionalSlash : /*}
 
 # Test page setting
 main_testType:
-   path:     /test/{cat}/{type}
+   path:     /show/{cat}/{type}{optionalSlash}
    defaults: { _controller: B2MainBundle:Test:setTesting }
+   requirements: { optionalSlash : /*}
 
 # Test page stored to different table
 set_question:
@@ -31,13 +33,9 @@ test_start:
 answer_submit:
     path:     /test/submit
     defaults: { _controller: B2MainBundle:Test:submit }
+
 # test over
 test_over:
     path:     /test/result
     defaults: { _controller: B2MainBundle:Test:result }
 
-#evaluation
-#  path:     /test/evaluation
-
-#result
-# path : /result

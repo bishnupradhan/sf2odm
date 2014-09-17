@@ -7,8 +7,7 @@
                 {% set sub = subcategory|split('-') %}
 
                 <div class="alert alert-success" role="alert">
-                    <h4>You have successful complete the test for
-                        : {% for catName in cat %} {{ catName|capitalize }}{% endfor %}
+                    <h4>Your Test Result for {% for catName in cat %} {{ catName|capitalize }}{% endfor %}
                         >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h4>
                 </div>
                 <div class="test-summary">

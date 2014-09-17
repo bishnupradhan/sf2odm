@@ -67,70 +67,74 @@ class TestController extends Controller
         /*print "<pre>".date("Y-m-d H:m:s");
         print_r($_REQUEST);
         print "</pre>";exit;*/
+        if(isset($_REQUEST['QuestionSet']) && !empty($_REQUEST['QuestionSet'])){
+            $dm = $this->get('doctrine_mongodb')->getManager();
 
+            $userTest = new \B2\MainBundle\Document\UserTest();
+            $userTest->setUser($_REQUEST['QuestionSet']['user']);
+            $userTest->setCategory($_REQUEST['QuestionSet']['category']);
+            $userTest->setSubcategory($_REQUEST['QuestionSet']['subcategory']);
+            $userTest->setDateTime(date("Y-m-d H:m:s"));
+            $userTest->setIp($this->container->get('request')->getClientIp());
+            $userTest->setIsTestComplete("0");
 
-        $dm = $this->get('doctrine_mongodb')->getManager();
-
-        $userTest = new \B2\MainBundle\Document\UserTest();
-        $userTest->setUser($_REQUEST['QuestionSet']['user']);
-        $userTest->setCategory($_REQUEST['QuestionSet']['category']);
-        $userTest->setSubcategory($_REQUEST['QuestionSet']['subcategory']);
-        $userTest->setDateTime(date("Y-m-d H:m:s"));
-        $userTest->setIp($this->container->get('request')->getClientIp());
-        $userTest->setIsTestComplete("0");
-
-        $dm->persist($userTest);
-        $dm->flush();
-
-        $userTestId = $userTest->getId();
-
-        if(!empty($userTestId)){
-            // go for indivisual test setting
-            $modelName = trim($_REQUEST['modelName']);
-
-            //echo $this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);exit;
-            $qDoc = '\B2\MainBundle\Document\\'."Q".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
-
-            $questionType = new $qDoc();
-
-            $questionType->setUserTestDocumentId($userTestId);
-            $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
-            $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
-            $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
-            $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
-
-            $dm->persist($questionType);
+            $dm->persist($userTest);
             $dm->flush();
-            $questionTypeId = $questionType->getId();
 
-            if(!empty($questionTypeId)){
-                return $this->render('B2MainBundle:Test:startTest.html.twig',
-                    array(
-                        'modelName'=>$modelName,
-                        'category'=>$_REQUEST['QuestionSet']['category'],
-                        'subcategory'=>$_REQUEST['QuestionSet']['subcategory'],
-                        'user'=>$_REQUEST['QuestionSet']['user'],
-                        'questionDocumentTypeID'=>$questionTypeId
-                    ));
+            $userTestId = $userTest->getId();
+
+            if(!empty($userTestId)){
+                // go for indivisual test setting
+                $modelName = trim($_REQUEST['modelName']);
+
+                //echo $this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);exit;
+                $qDoc = '\B2\MainBundle\Document\\'."Q".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
+
+                $questionType = new $qDoc();
+
+                $questionType->setUserTestDocumentId($userTestId);
+                $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
+                $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
+                $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
+                $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
+
+                $dm->persist($questionType);
+                $dm->flush();
+                $questionTypeId = $questionType->getId();
+
+                if(!empty($questionTypeId)){
+                    return $this->render('B2MainBundle:Test:startTest.html.twig',
+                        array(
+                            'modelName'=>$modelName,
+                            'category'=>$_REQUEST['QuestionSet']['category'],
+                            'subcategory'=>$_REQUEST['QuestionSet']['subcategory'],
+                            'user'=>$_REQUEST['QuestionSet']['user'],
+                            'questionDocumentTypeID'=>$questionTypeId
+                        ));
+                }else{
+                    $this->get('session')->getFlashBag()->add( 'error','Error in data insertion. Please re-structure the question.');
+                    // removing test id from UserTest document
+                    $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
+                        ->findAndRemove()
+                        ->field('id')->equals($userTestId)
+                        ->getQuery()
+                        ->execute();
+
+                    // go to question setting page
+                    $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
+                    //return $this->redirect($this->generateUrl("main_list"));
+                }
             }else{
-                $this->get('session')->getFlashBag()->add( 'error','Error in data insertion. Please re-structure the question.');
-                // removing test id from UserTest document
-                $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
-                    ->findAndRemove()
-                    ->field('id')->equals($userTestId)
-                    ->getQuery()
-                    ->execute();
+                $this->get('session')->getFlashBag()->add( 'error','Error in test id generation. Please re-structure the question.');
 
                 // go to question setting page
                 $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
                 //return $this->redirect($this->generateUrl("main_list"));
             }
-        }else{
-            $this->get('session')->getFlashBag()->add( 'error','Error in test id generation. Please re-structure the question.');
 
-            // go to question setting page
-            $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
-            //return $this->redirect($this->generateUrl("main_list"));
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','Request cannot be processed.');
+            return $this->redirect($this->generateUrl("main_list"));
         }
     }
 
@@ -144,53 +148,10 @@ class TestController extends Controller
     public function testAction( $questionSheetIndex = 0,$questionObjID = ''){
         //print "<pre>";print_r($_REQUEST);print "</pre>";//exit;
 
-        //$questionSheetIndex = isset($_REQUEST['numSheets']) && !empty($_REQUEST['numSheets']) ? $_REQUEST['numSheets'] : 0;
-        $questionSheetIndex = $questionSheetIndex ? $questionSheetIndex : 0;
+        if((isset($_REQUEST['questionDocumentTypeID']) && !empty($_REQUEST['questionDocumentTypeID'])) || $questionSheetIndex || $questionObjID) {
+            $questionSheetIndex = $questionSheetIndex ? $questionSheetIndex : 0;
+            $questionDocumentTypeID = !empty($questionObjID) ? $questionObjID : $_REQUEST['questionDocumentTypeID'];
 
-        $questionDocumentTypeID = !empty($questionObjID) ? $questionObjID : $_REQUEST['questionDocumentTypeID'];
-
-
-        $dm = $this->get('doctrine_mongodb')->getManager();
-
-
-        $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
-        $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
-        $bundle = 'B2MainBundle:'."Q".$qClassType;
-
-        $qb = $dm->createQueryBuilder($bundle)
-            ->hydrate(false)
-            ->field('id')->equals($questionDocumentTypeID);
-        $query = $qb->getQuery();
-        $questionStructure = $query->getSingleResult();
-
-        //print "<pre>";var_dump($questionStructure);print "</pre>";exit;
-
-        /////////////////////////////////////////////////////////
-        if($questionSheetIndex < $questionStructure['numSheets']){  // go for next question set
-
-            $questionObject = new  $qDoc($questionStructure['_id']);
-
-            //return $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
-            $classObjDisplay = $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
-            //echo $classObjDisplay;exit;
-
-            return $this->render('B2MainBundle:Test:_display.html.twig',
-                array(
-                    'category'=>$_REQUEST['category'],
-                    'subcategory'=>$_REQUEST['subcategory'],
-                    'user'=>$_REQUEST['user'],
-                    'classObjDisplay'=> $classObjDisplay,
-                    'questionSheetIndex'=>$questionSheetIndex
-                ));
-        }else{ // go for complete/thanks page
-            $clsType = $_REQUEST['questionClassName'];
-
-            $explodedClass = explode('\\', $clsType);
-            $answerClassType = $explodedClass[3];
-
-            $questionClass = substr($answerClassType,1);
-
-            // get user_test id
             $dm = $this->get('doctrine_mongodb')->getManager();
 
             $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
@@ -203,41 +164,90 @@ class TestController extends Controller
             $query = $qb->getQuery();
             $questionStructure = $query->getSingleResult();
 
+            //print "<pre>";var_dump($questionStructure);print "</pre>";exit;
 
-            // updating isTestComplete flag
-            $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
-                ->findAndUpdate()
-                ->field('id')->equals($questionStructure['userTestDocumentId'])
-                ->field('isTestComplete')->set(true)
-                ->getQuery()
-                ->execute();
+            /////////////////////////////////////////////////////////
+            if($questionSheetIndex < $questionStructure['numSheets']){  // go for next question set
 
-            return $this->render('B2MainBundle:Test:testComplete.html.twig',
-                array(
+                $questionObject = new  $qDoc($questionStructure['_id']);
+
+                //return $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
+                $classObjDisplay = $this->processByQuestionClassType($questionObject, $questionStructure, $qClassType);
+                //echo $classObjDisplay;exit;
+
+                return $this->render('B2MainBundle:Test:_display.html.twig',
+                    array(
+                        'category'=>$_REQUEST['category'],
+                        'subcategory'=>$_REQUEST['subcategory'],
+                        'user'=>$_REQUEST['user'],
+                        'classObjDisplay'=> $classObjDisplay,
+                        'questionSheetIndex'=>$questionSheetIndex
+                    ));
+            }else{ // go for complete/thanks page
+                $clsType = $_REQUEST['questionClassName'];
+
+                $explodedClass = explode('\\', $clsType);
+                $answerClassType = $explodedClass[3];
+
+                $questionClass = substr($answerClassType,1);
+
+                // get user_test id
+                $dm = $this->get('doctrine_mongodb')->getManager();
+
+                $qClassType = $this->getProperFormat(trim($_REQUEST['subcategory']));
+                $qDoc = '\B2\MainBundle\Document\\'."Q".$qClassType;
+                $bundle = 'B2MainBundle:'."Q".$qClassType;
+
+                $qb = $dm->createQueryBuilder($bundle)
+                    ->hydrate(false)
+                    ->field('id')->equals($questionDocumentTypeID);
+                $query = $qb->getQuery();
+                $questionStructure = $query->getSingleResult();
+
+
+                // updating isTestComplete flag
+                $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
+                    ->findAndUpdate()
+                    ->field('id')->equals($questionStructure['userTestDocumentId'])
+                    ->field('isTestComplete')->set(true)
+                    ->getQuery()
+                    ->execute();
+
+                return $this->render('B2MainBundle:Test:testComplete.html.twig',
+                    array(
+                        'questionClassType'=>$questionClass,
+                        'questionObjID'=>$_REQUEST['questionObjID'],
+                        'answerObjID'=>$_REQUEST['answerObjID'],
+                        'category'=>$_REQUEST['category'],
+                        'subcategory'=>$_REQUEST['subcategory'],
+                        'user'=>$_REQUEST['user'],
+                    )
+                );
+            }
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','Request cannot be processed.');
+            return $this->redirect($this->generateUrl("main_list"));
+        }
+    }
+
+    public function resultAction(){
+        if(isset($_REQUEST['questionClassType']) && !empty($_REQUEST['questionClassType'])){
+            $questionClass = $_REQUEST['questionClassType'];
+            $result = $this->collectAllQuestionAttemptData($_REQUEST['questionObjID'],$_REQUEST['user'],$questionClass);
+
+            return $this->render('B2MainBundle:Test:_result.html.twig',
+                array('result'=> $result,
                     'questionClassType'=>$questionClass,
-                    'questionObjID'=>$_REQUEST['questionObjID'],
                     'answerObjID'=>$_REQUEST['answerObjID'],
                     'category'=>$_REQUEST['category'],
                     'subcategory'=>$_REQUEST['subcategory'],
                     'user'=>$_REQUEST['user'],
                 )
             );
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','Request cannot be processed.');
+            return $this->redirect($this->generateUrl("main_list"));
         }
-    }
-
-    public function resultAction(){
-        $questionClass = $_REQUEST['questionClassType'];
-        $result = $this->collectAllQuestionAttemptData($_REQUEST['questionObjID'],$_REQUEST['user'],$questionClass);
-
-        return $this->render('B2MainBundle:Test:_result.html.twig',
-            array('result'=> $result,
-                'questionClassType'=>$questionClass,
-                'answerObjID'=>$_REQUEST['answerObjID'],
-                'category'=>$_REQUEST['category'],
-                'subcategory'=>$_REQUEST['subcategory'],
-                'user'=>$_REQUEST['user'],
-            )
-        );
     }
 
     protected function processByQuestionClassType($classObject, $mongoObject, $classType) {
@@ -295,25 +305,29 @@ class TestController extends Controller
      */
     public function submitAction(){
         //print "<pre>Submition : ";print_r($_REQUEST);print "</pre>";exit;
-        $clsType = $_REQUEST['questionClassName'];
+        if(isset($_REQUEST['questionClassName']) && !empty($_REQUEST['questionClassName'])){
+            $clsType = $_REQUEST['questionClassName'];
 
-        $explodedClass = explode('\\', $clsType);
-        $answerClassType = $explodedClass[3];
+            $explodedClass = explode('\\', $clsType);
+            $answerClassType = $explodedClass[3];
 
-        $questionClass = substr($answerClassType,1);
+            $questionClass = substr($answerClassType,1);
 
-        $funcName = "processA".$questionClass;
+            $funcName = "processA".$questionClass;
 
-        $res = $this->$funcName();
-        //var_dump($res);
-        if(!empty($res)){ // go for next sheet
-            $res = (int) $res;
-            return $this->testAction($res,$_REQUEST['questionObjID']);
-        }else{  // error
-            echo "Some error while data insertion";
-            exit;
+            $res = $this->$funcName();
+            //var_dump($res);
+            if(!empty($res)){ // go for next sheet
+                $res = (int) $res;
+                return $this->testAction($res,$_REQUEST['questionObjID']);
+            }else{  // error
+                $this->get('session')->getFlashBag()->add( 'error','Error in data insertion.');
+                return $this->redirect($this->generateUrl("main_list"));
+            }
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','Request cannot be processed.');
+            return $this->redirect($this->generateUrl("main_list"));
         }
-
     }
 
 

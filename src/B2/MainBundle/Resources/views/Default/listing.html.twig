@@ -15,7 +15,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-toggle="collapse" data-target="#{{ cat.id }}">
                     <h4 class="panel-title">
-                        <a href="{{ url('_homepage') }}test/{{ cat.category|e }}/"> {{ cat.categoryName|e }}</a>
+                        <a href="{{ url('_homepage') }}show/{{ cat.category|e }}"> {{ cat.categoryName|e }}</a>
                     </h4>
                 </div>
                 <div id="{{ cat.id }}" class="panel-collapse collapse">
@@ -23,7 +23,7 @@
                     <div class="panel-body">
                         {% for subcat in cat.sub %}
                             <div class="list-group">
-                            <a href="{{ url('_homepage') }}test/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                            <a href="{{ url('_homepage') }}show/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
                             </div>
                         {% endfor %}
                             </div>
