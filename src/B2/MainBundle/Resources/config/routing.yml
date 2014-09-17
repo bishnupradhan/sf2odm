@@ -2,10 +2,15 @@ _homepage:
     path:     /
     defaults: { _controller: B2MainBundle:Default:index }
 
-# cat/subcat listing
+# category/subcategory(question type) listing
 main_list:
     path:     /listing
     defaults: { _controller: B2MainBundle:Default:listing }
+
+# Category page listing
+main_catType:
+  path:     /test/{cat}/
+  defaults: { _controller: B2MainBundle:Default:catListing }
 
 # Test page setting
 main_testType:
