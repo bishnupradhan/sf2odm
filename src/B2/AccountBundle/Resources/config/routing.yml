@@ -9,3 +9,6 @@ account_login:
 b2_account_show:
     path:     /account/show
     defaults: { _controller: B2AccountBundle:Account:show }
+
+login_check:
+    path:    /login_check

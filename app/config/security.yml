@@ -8,5 +8,14 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        default:
+        #default:
+            #anonymous: ~
+
+        secured_area:
+            pattern: ^/
             anonymous: ~
+            form_login:
+                login_path: account_login
+                check_path: login_check
+    access_control:
+        - { path: ^/listing, roles: ROLE_ADMIN }
