@@ -6,6 +6,7 @@
 
     <h2 class="form-signin-heading">Registration</h2>
 
+
     <div class="form-element">
         {{ form_errors(form.firstName) }}
         {{ form_widget(form.firstName, { 'attr': {'class': 'form-control', 'placeholder':'First Name'} }) }}
@@ -34,5 +35,6 @@
     <div class="form-element">
         <input type="submit" value="{{ 'registration.submit'|trans }}" class="btn btn-lg btn-primary btn-block" />
     </div>
+    {{ form_rest(form) }}
 </form>
 </div>
