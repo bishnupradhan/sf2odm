@@ -26,11 +26,20 @@ class DefaultController extends Controller
             ->getManager()
             ->getRepository('B2MainBundle:Category');
 
-        $cat = $repository->findAll();
+        $res = $repository->findAll();
 
-        //print "<pre>";print_r($cat);print "</pre>";exit;
+        // for making accordion two column
+        $size = sizeof($res);
+        $col1 = $col2 = array();
+        foreach($res as $index => $val ){
+            if($index < round($size/2)){
+                array_push($col1,$val);
+            }else{
+                array_push($col2,$val);
+            }
 
-        return $this->render('B2MainBundle:Default:listing.html.twig',array('data' => $cat));
+        }
+        return $this->render('B2MainBundle:Default:listing.html.twig',array('col1' => $col1,'col2' => $col2));
     }
 
     public function catListingAction($cat){
