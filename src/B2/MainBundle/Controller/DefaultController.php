@@ -6,6 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\UserBundle\Model\UserInterface;
+
 use B2\MainBundle\Document;
 use B2\MainBundle\Model;    // to be removed
 use B2\MainBundle\AnswerSheet;
@@ -21,6 +25,12 @@ class DefaultController extends Controller
     }
 
     public function listingAction(){
+        /*$user = $this->container->get('security.context')->getToken()->getUser();
+        print "<pre>";  print_r($user);
+        print "</pre>";
+        if (!is_object($user) || !$user instanceof UserInterface) {
+            throw new AccessDeniedException('This user does not have access to this section.');
+        }*/
 
         $repository = $this->get('doctrine_mongodb')
             ->getManager()

@@ -92,15 +92,9 @@ class TestController extends Controller
 
                 $questionType = new $qDoc();
 
-                $questionType->setUserTestDocumentId($userTestId);
-                $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
-                $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
-                $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
-                $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
+                $funcName = "setQ".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
 
-                $dm->persist($questionType);
-                $dm->flush();
-                $questionTypeId = $questionType->getId();
+                $questionTypeId = $this->$funcName($questionType, $userTestId,$modelName);
 
                 if(!empty($questionTypeId)){
                     return $this->render('B2MainBundle:Test:startTest.html.twig',
@@ -137,6 +131,28 @@ class TestController extends Controller
             return $this->redirect($this->generateUrl("main_list"));
         }
     }
+
+    //************************** Set Question for individual question type Starts*******************************//
+    public function setQCompareNumber($questionType, $userTestId,$modelName){
+        $dm = $this->get('doctrine_mongodb')->getManager();
+
+        $questionType->setUserTestDocumentId($userTestId);
+        $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
+        $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
+        $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
+        $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
+        $questionType->setQStatus("general");
+
+        $dm->persist($questionType);
+        $dm->flush();
+        $questionTypeId = $questionType->getId();
+        return $questionTypeId;
+    }
+
+
+
+
+    /// ***** End of Set Question part ****///
 
 
     /**
@@ -278,7 +294,7 @@ class TestController extends Controller
     }
 
 
-    //************************** Create Question for indivisual question type Strats*******************************//
+    //************************** Create Question for individual question type Starts*******************************//
     public function processQCompareNumber($classObject, $mongoObject,$dm){
         $classObject->setUserTestDocumentId($mongoObject['userTestDocumentId']);
         $classObject->setNumQuestions($mongoObject['numQuestions']);
@@ -298,7 +314,7 @@ class TestController extends Controller
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The user's given answers are going to storeed in coresponding question model (a type)
+     * The user's given answers are going to stored in corresponding question model (a type)
      * - leads to result page
      * - the result page consits for score after evaluation and answer sheet
      * @return Response
@@ -331,7 +347,7 @@ class TestController extends Controller
     }
 
 
-    //************************** User Answer storing part  for indivisual question type Strats*******************************//
+    //************************** User Answer storing part  for individual question type Starts*******************************//
     protected function processACompareNumber(){
         //var_dump($_REQUEST);
         $dm = $this->get('doctrine_mongodb')->getManager();
@@ -391,7 +407,7 @@ class TestController extends Controller
     /// ***** End of User Answer storing part ****///
     //////////////////////////////////////// Evaluation ////////////////////////////////////////////////////////////////////////////////////
     /**
-     * Evauation process for corespongind answer
+     * Evaluation process for corresponding answer
      * @param string $studentAnswerObjectID
      * @param string $questionClassType
      * @return string

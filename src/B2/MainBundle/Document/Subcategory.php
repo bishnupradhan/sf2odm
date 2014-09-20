@@ -28,6 +28,12 @@ class Subcategory
      */
     protected $subcategory;
 
+    /**
+     * @MongoDB\Field(type="boolean")
+     * @Assert\NotBlank()
+     */
+    protected $isSample;
+
 
     public function setSubcategoryName($subcategoryName)
     {
@@ -57,6 +63,16 @@ class Subcategory
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setIsSample($isSample)
+    {
+        $this->isSample = $isSample;
+    }
+
+    public function getIsSample()
+    {
+        return $this->isSample;
     }
 
 
