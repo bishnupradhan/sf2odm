@@ -25,7 +25,7 @@
                                     <div class="list-group">
                                         {% if is_granted("ROLE_USER") %}
                                             <a href="{{ url('_homepage') }}show/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
-                                        {% elseif subcat.isSample %}
+                                        {% elseif subcat.hasSample %}
                                             <a href="{{ url('_homepage') }}sample/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
                                         {% else %}
                                             {{ subcat.subcategoryName|e }}
@@ -54,7 +54,7 @@
                                     <div class="list-group">
                                         {% if is_granted("ROLE_USER") %}
                                             <a href="{{ url('_homepage') }}show/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
-                                        {% elseif subcat.isSample %}
+                                        {% elseif subcat.hasSample %}
                                             <a href="{{ url('_homepage') }}sample/{{ cat.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
                                         {% else %}
                                             {{ subcat.subcategoryName|e }}
