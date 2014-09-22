@@ -59,6 +59,9 @@
                         {% endif %}
 
                     </ul>
+                    {% if app.user %}
+                    <div class="welcome-text"> Welcome {{ app.user }}</div>
+                    {% endif %}
                 </div><!--/.nav-collapse -->
             </div>
         </div>

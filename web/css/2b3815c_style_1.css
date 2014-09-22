@@ -6011,3 +6011,9 @@ td.visible-print {
   width: 45%;
   float: left;
 }
+.welcome-text {
+  color: #ffffff;
+  padding-top: 15px;
+  font-size: 16px;
+  float: right;
+}
