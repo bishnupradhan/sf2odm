@@ -54,6 +54,12 @@ class User extends BaseUser
      */
     protected $password;
 
+    /** @MongoDB\Field(type="string", nullable=true) */
+    protected $facebook_id;
+
+    /** @MongoDB\Field(type="string", nullable=true) */
+    protected $facebook_access_token;
+
     public function __construct()
     {
         parent::__construct();
@@ -117,4 +123,26 @@ class User extends BaseUser
         //$this->password = sha1($password);
         $this->password = $password;
     }
+
+    public function getFacebookAccessToken()
+    {
+        return $this->facebook_access_token;
+    }
+
+    public function setFacebookAccessToken($facebook_access_token)
+    {
+        $this->facebook_access_token = $facebook_access_token;
+    }
+
+    public function getFacebookId()
+    {
+        return $this->facebook_id;
+    }
+
+    public function setFacebookId($facebook_id)
+    {
+        $this->facebook_id = $facebook_id;
+    }
+
+
 }

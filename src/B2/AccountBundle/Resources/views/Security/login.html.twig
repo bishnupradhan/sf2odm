@@ -34,6 +34,11 @@
     <input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}"
             class="btn btn-lg btn-primary btn-block"/>
     </div>
+
+
 </form>
+    <div><a href="{{ path('hwi_oauth_service_redirect', {'service': 'facebook' }) }}"
+            alt="Sign in with Facebook" class="btn btn-primary" >
+            <i class="fa fa-facebook"></i> Sign in with Facebook</a></div>
     </div>
 {% endblock fos_user_content %}

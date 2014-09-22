@@ -5997,3 +5997,17 @@ td.visible-print {
   float: left;
   margin: 0 10px 10px 0px;
 }
+.content {
+  padding-top: 20px;
+}
+.content .lead {
+  font-size: 19px;
+}
+#accordion1 {
+  width: 45%;
+  float: left;
+}
+#accordion2 {
+  width: 45%;
+  float: left;
+}

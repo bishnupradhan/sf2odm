@@ -18,6 +18,17 @@ security:
                 check_path: /login_check
                 provider: fos_userbundle
                 csrf_provider: form.csrf_provider
+            oauth:
+                resource_owners:
+                    facebook:           "/login/check-facebook"
+                    google:             "/login/check-google"
+                login_path:        /login
+                failure_path:      /login
+
+                oauth_user_provider:
+                    #this is my custom user provider, created from FOSUBUserProvider - will manage the
+                    #automatic user registration on your site, with data from the provider (facebook. google, etc.)
+                    service: my_user_provider
             logout:
                 path: /logout
                 target: /login
