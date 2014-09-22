@@ -14,7 +14,13 @@
                 <div class="panel-body">
                     {% for subcat in data.sub %}
                         <div class="list-group">
-                            <a href="{{ url('_homepage') }}show/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                            {% if is_granted("ROLE_USER") %}
+                                <a href="{{ url('_homepage') }}show/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                            {% elseif subcat.isSample %}
+                                <a href="{{ url('_homepage') }}sample/{{ data.category|e }}/{{ subcat.subcategory|e }}">{{ subcat.subcategoryName|e }}</a>
+                            {% else %}
+                                {{ subcat.subcategoryName|e }}
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

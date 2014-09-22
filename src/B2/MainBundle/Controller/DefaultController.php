@@ -30,12 +30,16 @@ class DefaultController extends Controller
     }
 
     public function listingAction(){
-        /*$user = $this->container->get('security.context')->getToken()->getUser();
-        print "<pre>";  print_r($user);
-        print "</pre>";
+        /*
+        ///////   User authentication check
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        print "<pre>";  print_r($user); print "</pre>";
         if (!is_object($user) || !$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
-        }*/
+        }
+        // or //
+        $isUserLoggedIn = $this->get('security.context')->isGranted('ROLE_USER') ? true : false;*/
+
 
         $repository = $this->get('doctrine_mongodb')
             ->getManager()

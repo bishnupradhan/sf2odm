@@ -18,8 +18,6 @@ class QCompareNumber extends Question
     /** @ODM\Int */
     protected $numberMax;
 
-    /*** @ODM\String */
-    protected $qStatus;
 
 
     protected $finalRenderedHTML;
@@ -60,15 +58,6 @@ class QCompareNumber extends Question
         return $this->id;
     }
 
-    public function setQStatus($qStatus)
-    {
-        $this->qStatus = $qStatus;
-    }
-
-    public function getQStatus()
-    {
-        return $this->qStatus;
-    }
 
     public function create_questions($dm) {
         /*echo "create question";

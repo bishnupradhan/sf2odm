@@ -30,6 +30,12 @@ abstract class Question {
      */
     protected $numSheets;
 
+    /**
+     * @MongoDB\String
+     ** @Assert\NotBlank()
+     */
+    protected $qStatus;
+
 
     abstract public function render();
 
@@ -65,6 +71,16 @@ abstract class Question {
     public function getNumSheets()
     {
         return $this->numSheets;
+    }
+
+    public function setQStatus($qStatus)
+    {
+        $this->qStatus = $qStatus;
+    }
+
+    public function getQStatus()
+    {
+        return $this->qStatus;
     }
 
 

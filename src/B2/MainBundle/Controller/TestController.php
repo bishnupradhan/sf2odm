@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 /*use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;*/
 
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use FOS\UserBundle\Model\UserInterface;
+
 use Symfony\Component\Finder\Finder;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +22,51 @@ use B2\MainBundle\AnswerSheet;
 
 class TestController extends Controller
 {
+    /**
+     * This is for guest user account. which leads to practice page.
+     * @param $cat      // category
+     * @param $type     // subcat or question type
+     * @return Response
+     */
+    public function sampleTestAction($cat,$type){
+        // checking if registered user, redirect him to question setter page
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        if (is_object($user) || $user instanceof UserInterface) {
+            return $this->redirect($this->generateUrl("main_testType",array('cat' => $cat,'type' => $type,'optionalSlash'=>'')));
+        }
 
+        $qDoc = $this->getProperFormat($type);
+        $modelName = strtolower($qDoc);
+        $documentBundle = 'B2MainBundle:'."Q".$qDoc;
+
+        $dm = $this->get('doctrine_mongodb')->getManager();
+        $qBuilder = $dm->createQueryBuilder($documentBundle)
+            ->hydrate(false)
+            ->field('qStatus')->equals("sample");
+        $mongoQuery = $qBuilder->getQuery();
+        $questionStructureArray = $mongoQuery->execute();
+
+        $qArr = array();
+        if(!is_null($questionStructureArray) && !empty($questionStructureArray)){
+            foreach($questionStructureArray as $eachQuestion){
+                array_push($qArr,$eachQuestion);
+            }
+            $questionDocument = $qArr[array_rand($qArr)];
+            $questionDocumentMongoObj = (array) $questionDocument['_id'];
+
+            return $this->render('B2MainBundle:Test:startTest.html.twig',
+                array(
+                    'modelName'=>$modelName,
+                    'category'=>$cat,
+                    'subcategory'=>$type,
+                    'user'=>'guest',
+                    'questionDocumentTypeID'=>$questionDocumentMongoObj['$id']
+                ));
+        }else{
+            $this->get('session')->getFlashBag()->add( 'notice','No Question has set for this type. Please try another.');
+            return $this->redirect($this->generateUrl("main_list"));
+        }
+    }
     /**
      * This is for setting the question model type. which leads to corresponding question model view.
      * @param $cat      // category
@@ -28,6 +75,12 @@ class TestController extends Controller
      */
 
     public function setTestingAction($cat,$type){
+
+        // restricting guest user to access
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        if (!is_object($user) || !$user instanceof UserInterface) {
+            throw new AccessDeniedException('This user does not have access to this section.');
+        }
 
         $qDoc = "Q".$this->getProperFormat($type);
 
@@ -39,7 +92,7 @@ class TestController extends Controller
 
             $Qtype = '\B2\MainBundle\Document\\'.$qDoc;
             $modelName = strtolower($this->getProperFormat($type));
-            $user = 'Bishnu';   // todo: user name to be fetch from session
+            $user = $this->get('security.context')->getToken()->getUser()->getUserName();
 
             $questionType = new $Qtype();
             /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
@@ -141,7 +194,7 @@ class TestController extends Controller
         $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
         $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
         $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
-        $questionType->setQStatus("general");
+        $questionType->setQStatus("custom");    // set by registered user
 
         $dm->persist($questionType);
         $dm->flush();
@@ -354,7 +407,7 @@ class TestController extends Controller
         $studentAnswerObject = new \B2\MainBundle\Document\ACompareNumber($_REQUEST['questionObjID']);
         $studentAnswerObject->setAnswerObjectID($_REQUEST['answerObjID']);
         //todo: change this to be dynamic depending upon the student giving the test
-        $studentAnswerObject->setUser('Bishnu');
+        $studentAnswerObject->setUser($_REQUEST['user']);
         foreach($_REQUEST['cmpInput'] as $answerKey=>$answerValue){
             switch($answerValue){
                 case '<': $compareValue = '&#60;';

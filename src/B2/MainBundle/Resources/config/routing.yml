@@ -19,6 +19,11 @@ main_testType:
    defaults: { _controller: B2MainBundle:Test:setTesting }
    requirements: { optionalSlash : /*}
 
+main_sample_test:
+   path:     /sample/{cat}/{type}{optionalSlash}
+   defaults: { _controller: B2MainBundle:Test:sampleTest }
+   requirements: { optionalSlash : /*}
+
 # Test page stored to different table
 set_question:
    path:     /test/start
