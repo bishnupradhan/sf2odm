@@ -2,21 +2,35 @@
 
     {% block content %}
         <div class="container">
-
+        <div class="question-panel">
         {% set cat = category|split('-') %}
         {% set sub = subcategory|split('-') %}
 
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Question Set : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 class="label label-info">Do as Directed : </h4>
+                    <form action="{{ path('answer_submit') }}" method="post" autocomplete="off" class="question-worksheet">
+                        <input type="hidden" readonly="readonly" name="category" value="{{ category }}"/>
+                        <input type="hidden" readonly="readonly" name="subcategory" value="{{ subcategory }}"/>
+                        <input type="hidden" readonly="readonly" name="user" value="{{ user }}"/>
+                        <input type="hidden" readonly="readonly" name="questionSheetIndex" value="{{ questionSheetIndex }}"/>
 
-        <h3>Question Set : {% for catName in cat %} {{ catName|capitalize }}{% endfor %} >> {% for catName in sub %} {{ catName|capitalize }}{% endfor %}</h3>
-        <h3>Do as Directed : </h3>
-        <form action="{{ path('answer_submit') }}" method="post" autocomplete="off">
-            <input type="hidden" readonly="readonly" name="category" value="{{ category }}"/>
-            <input type="hidden" readonly="readonly" name="subcategory" value="{{ subcategory }}"/>
-            <input type="hidden" readonly="readonly" name="user" value="{{ user }}"/>
-            <input type="hidden" readonly="readonly" name="questionSheetIndex" value="{{ questionSheetIndex }}"/>
+                        {{ classObjDisplay|raw }}
 
-            {{ classObjDisplay|raw }}
-            <input type="submit" value="Submit"/>
-        </form>
+                        <div class="answer-submit">
+                        <input type="submit" value="Submit" class="btn btn-primary" />
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+
+
+        </div>
         </div>
     {% endblock %}

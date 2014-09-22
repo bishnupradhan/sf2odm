@@ -6017,3 +6017,38 @@ td.visible-print {
   font-size: 16px;
   float: right;
 }
+.question-panel {
+  padding: 20px;
+}
+.question-panel h3 {
+  font-size: 17px;
+}
+.question-panel h4 {
+  font-size: 16px;
+}
+.question-worksheet {
+  padding: 15px;
+}
+.question-worksheet .cl {
+  clear: both;
+}
+.question-worksheet .worksheetStyle {
+  margin: 10px;
+  float: left;
+}
+.question-worksheet .worksheetStyle span {
+  font-size: 19px;
+  margin: 10px 5px;
+}
+.blue-input {
+  background-color: #EDF3F5;
+  width: 90px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+.gray-input {
+  background-color: #e8e7e6;
+  width: 90px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
