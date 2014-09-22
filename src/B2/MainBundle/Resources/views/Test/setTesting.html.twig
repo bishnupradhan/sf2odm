@@ -27,12 +27,12 @@
 
                 <div class="form-element">
                     <label for="QuestionSet_numSheets">Number of Sheets</label>
-                    <input type="text" id="QuestionSet_numSheets" name="QuestionSet[numSheets]" value=""
+                    <input type="text" id="QuestionSet_numSheets" name="QuestionSet[numSheets]" value="{{questionType.numSheets}}"
                            class="form-control"/>
                 </div>
                 <div class="form-element">
                     <label for="QuestionSet_numQuestion">Number of Question per Sheet</label>
-                    <input type="text" id="QuestionSet_numQuestion" name="QuestionSet[numQuestion]" value=""
+                    <input type="text" id="QuestionSet_numQuestion" name="QuestionSet[numQuestion]" value="{{questionType.numQuestions}}"
                            class="form-control"/>
                 </div>
                 {{ include( 'B2MainBundle:QuestionType:'~ modelName ~'.html.twig') }}

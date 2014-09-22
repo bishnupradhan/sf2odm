@@ -95,6 +95,37 @@ class TestController extends Controller
             $user = $this->get('security.context')->getToken()->getUser()->getUserName();
 
             $questionType = new $Qtype();
+            if(isset($_REQUEST['questionDocumentTypeID']) && !empty($_REQUEST)){   // reconfigure question structure
+
+                // get the last test structure
+                $qDoc = $this->getProperFormat($type);
+                $modelName = strtolower($qDoc);
+                $documentBundle = 'B2MainBundle:'."Q".$qDoc;
+
+                $dm = $this->get('doctrine_mongodb')->getManager();
+                $qBuilder = $dm->createQueryBuilder($documentBundle)
+                    ->hydrate(false)
+                    ->field('id')->equals($_REQUEST['questionDocumentTypeID']);
+                $mongoQuery = $qBuilder->getQuery();
+                $questionStructureArr = $mongoQuery->getSingleResult();
+
+                $questionType = $questionStructureArr;
+
+                // remove the current document
+                $job = $dm->createQueryBuilder($documentBundle)
+                    ->findAndRemove()
+                    ->field('id')->equals($questionStructureArr['_id'])
+                    ->getQuery()
+                    ->execute();
+
+                // remove the exiting test id
+                 $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
+                     ->findAndRemove()
+                     ->field('id')->equals($questionStructureArr['userTestDocumentId'])
+                     ->getQuery()
+                     ->execute();
+
+            }
             /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
             return $this->render('B2MainBundle:Test:setTesting.html.twig',
                 array(

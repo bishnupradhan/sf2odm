@@ -22,5 +22,15 @@
 
             <input type="submit" value="Start"/>
         </form>
+            <form action="{{ path('main_testType', {'cat': category, 'type': subcategory,'optionalSlash':''})}}" method="post">
+
+                <input type="hidden" readonly="readonly" name="category" value="{{ category }}"/>
+                <input type="hidden" readonly="readonly" name="subcategory" value="{{ subcategory }}"/>
+                <input type="hidden" readonly="readonly" name="user" value="{{ user }}"/>
+                <input type="hidden" readonly="readonly" name="modelName" value="{{ modelName }}"/>
+                <input type="hidden" readonly="readonly" name="questionDocumentTypeID" value="{{ questionDocumentTypeID }}"/>
+
+                <input type="submit" value="Re-Configure"/>
+            </form>
         </div>
     {% endblock %}
