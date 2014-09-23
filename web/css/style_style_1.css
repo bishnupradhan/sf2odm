@@ -5954,9 +5954,11 @@ td.visible-print {
     display: none !important;
   }
 }
+.content-container {
+  padding-top: 20px;
+}
 .form-signin {
   max-width: 330px;
-  padding: 15px;
   margin: 0 auto;
 }
 .form-signin .form-element {
@@ -5980,9 +5982,6 @@ td.visible-print {
 }
 .form-question-set input[type='submit'] {
   width: 150px;
-}
-.login-form {
-  padding: 20px;
 }
 .result-summary {
   padding: 20px;

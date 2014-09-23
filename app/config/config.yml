@@ -144,6 +144,11 @@ fos_user:
     registration:
         form:
             type: b2_user_registration
+        confirmation:
+            enabled: true
+            from_email:
+                address: tropixtechnologies@gmail.com
+                sender_name: UnMP
 
 
 hwi_oauth:

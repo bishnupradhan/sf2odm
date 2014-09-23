@@ -25,6 +25,13 @@ class DefaultController extends Controller
     {
        /* $session = $request->getSession();
         var_dump($session);*/
+        /*$message = \Swift_Message::newInstance()
+            ->setSubject('Hello Email')
+            ->setFrom('tropixtechnologies@gmail.com')
+            ->setTo('chinmay.sahoo@gmail.com')
+            ->setBody("Hello Chinmay")
+        ;
+        $this->get('mailer')->send($message);*/
 
         return $this->render('B2MainBundle:Default:index.html.twig');
     }
