@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\UserBundle\Model\UserInterface;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,7 +75,7 @@ class TestController extends Controller
      * @return Response
      */
 
-    public function setTestingAction($cat,$type){
+    public function setTestingAction($cat, $type, $response=array()){
 
         // restricting guest user to access
         $user = $this->container->get('security.context')->getToken()->getUser();
@@ -92,7 +93,7 @@ class TestController extends Controller
 
             $Qtype = '\B2\MainBundle\Document\\'.$qDoc;
             $modelName = strtolower($this->getProperFormat($type));
-            $user = $this->get('security.context')->getToken()->getUser()->getUserName();
+            $userName = $this->get('security.context')->getToken()->getUser()->getUserName();
 
             $questionType = new $Qtype();
             if(isset($_REQUEST['questionDocumentTypeID']) && !empty($_REQUEST)){   // reconfigure question structure
@@ -126,14 +127,19 @@ class TestController extends Controller
                      ->execute();
 
             }
-            /*print "<pre>"; print_r($questionType); print "</pre>";exit;*/
+            if(!empty($response)){
+                $questionType = $response['questionType'];
+            }
+            //print "<pre>"; print_r($response); print "</pre>";//exit;
             return $this->render('B2MainBundle:Test:setTesting.html.twig',
                 array(
                     'questionType' => $questionType,
                     'modelName'=>$modelName,
                     'category'=>$cat,
                     'subcategory'=>$type,
-                    'user'=>$user
+                    'user'=>$userName,
+                    'response'=>$response
+
                 ));
         }else{
             $this->get('session')->getFlashBag()->add( 'notice','No test type found. Please try another.');
@@ -150,6 +156,26 @@ class TestController extends Controller
 
         /*print "<pre>".date("Y-m-d H:m:s");
         print_r($_REQUEST);
+        $qDoc = '\B2\MainBundle\Document\\'."Q".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
+
+        $questionType = new $qDoc();
+        //var_dump($questionType);
+        $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
+        $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
+        $questionType->setNumQuestions($_REQUEST['QuestionSet']['numQuestion']);
+        $questionType->setNumSheets($_REQUEST['QuestionSet']['numSheets']);
+        $questionType->setQStatus("custom");    // set by registered user
+
+        $validator = $this->get('validator');
+        $errors = $validator->validate($questionType);
+        print_r($errors);
+        foreach($errors as $ind=>$err){
+            print($errors[$ind]->getPropertyPath().":".$errors[$ind]->getMessage()."<br>");
+        }
+        if (count($errors) > 0) {
+            throw new HttpException(400, $errors[0]->getMessage());
+        }
+
         print "</pre>";exit;*/
         if(isset($_REQUEST['QuestionSet']) && !empty($_REQUEST['QuestionSet'])){
             $dm = $this->get('doctrine_mongodb')->getManager();
@@ -178,18 +204,25 @@ class TestController extends Controller
 
                 $funcName = "setQ".$this->getProperFormat($_REQUEST['QuestionSet']['subcategory']);
 
-                $questionTypeId = $this->$funcName($questionType, $userTestId,$modelName);
+                $questionResponse = $this->$funcName($questionType, $userTestId,$modelName);
+                //print "<pre>";
+                //print_r($questionResponse);
+                //var_dump($questionResponse);
+                //print "</pre><hr>";
 
-                if(!empty($questionTypeId)){
+
+                if(!empty($questionResponse) && ($questionResponse['validate']) && empty($questionResponse['errors']) && ($questionResponse['generatedDocumentID'])){
+                    echo "validate";//exit;
                     return $this->render('B2MainBundle:Test:startTest.html.twig',
                         array(
                             'modelName'=>$modelName,
                             'category'=>$_REQUEST['QuestionSet']['category'],
                             'subcategory'=>$_REQUEST['QuestionSet']['subcategory'],
                             'user'=>$_REQUEST['QuestionSet']['user'],
-                            'questionDocumentTypeID'=>$questionTypeId
+                            'questionDocumentTypeID'=>$questionResponse['generatedDocumentID']
                         ));
                 }else{
+                    echo "not validate";//exit;
                     $this->get('session')->getFlashBag()->add( 'error','Error in data insertion. Please re-structure the question.');
                     // removing test id from UserTest document
                     $job = $dm->createQueryBuilder('B2MainBundle:UserTest')
@@ -199,14 +232,14 @@ class TestController extends Controller
                         ->execute();
 
                     // go to question setting page
-                    $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
+                    return $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory'],$questionResponse);
                     //return $this->redirect($this->generateUrl("main_list"));
                 }
             }else{
                 $this->get('session')->getFlashBag()->add( 'error','Error in test id generation. Please re-structure the question.');
 
                 // go to question setting page
-                $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
+                return $this->setTestingAction($_REQUEST['QuestionSet']['category'],$_REQUEST['QuestionSet']['subcategory']);
                 //return $this->redirect($this->generateUrl("main_list"));
             }
 
@@ -226,11 +259,33 @@ class TestController extends Controller
         $questionType->setNumberMin($_REQUEST[$modelName]['numberMin']);
         $questionType->setNumberMax($_REQUEST[$modelName]['numberMax']);
         $questionType->setQStatus("custom");    // set by registered user
+        $res = array();
+        $result = $this->checkWithValidator($questionType);
+        if($result['validate']){        // go ahead
+            $dm->persist($questionType);
+            $dm->flush();
+            $questionTypeId = $questionType->getId();
+            $res = array('validate'=>true,'errors'=>array(),'generatedDocumentID'=>$questionTypeId,'questionType'=>$questionType);
+        }else{
+            foreach($result['errors'] as $indx => $errs){
+                $err[$result['errors'][$indx]->getPropertyPath()] = $result['errors'][$indx]->getMessage();
+            }
+            $res = array('validate'=>false,'errors'=>$err,'generatedDocumentID'=>'','questionType'=>$questionType);
+        }
+        return $res;
 
-        $dm->persist($questionType);
-        $dm->flush();
-        $questionTypeId = $questionType->getId();
-        return $questionTypeId;
+    }
+
+    protected function checkWithValidator($questionTypeArr){
+
+        $validator = $this->get('validator');
+        $errors = $validator->validate($questionTypeArr);
+        if (count($errors) > 0) {   // contains validation error
+            $result = array('validate'=>false,'errors'=>$errors);
+        }else{
+            $result = array('validate'=>true,'errors'=>array());
+        }
+        return $result;
     }
 
 

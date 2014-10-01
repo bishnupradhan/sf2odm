@@ -21,18 +21,21 @@ abstract class Question {
     /**
      * @MongoDB\Int
      * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @Assert\Range(min = "4", max = "10",minMessage = "Minimum should not be less than  4.",maxMessage = "Maximum should not be greater than 10.")
      */
     protected $numQuestions;
 
     /**
      * @MongoDB\Int
      * @Assert\NotBlank()
+     * @Assert\Range(min = "1", max = "5",minMessage = "Minimum should not be less than  1.",maxMessage = "Maximum should not be greater than 5.")
      */
     protected $numSheets;
 
     /**
      * @MongoDB\String
-     ** @Assert\NotBlank()
+     * @Assert\NotBlank()
      */
     protected $qStatus;
 

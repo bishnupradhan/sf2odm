@@ -1,5 +1,41 @@
 {% extends 'B2MainBundle::layout.html.twig' %}
 {#{% block title "- Login form -" %}#}
+
+{% block javascripts %}
+    <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/validate.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        function checkValidation(){
+            var validator=$("#frmSetTesting").validate({
+                rules: {
+                    "QuestionSet[numSheets]": {
+                        required:true,
+                        digits:true
+                    },
+                    "QuestionSet[numQuestion]": {
+                        required:true,
+                        number:true
+                    }
+                },
+                messages: {
+                    "QuestionSet[numSheets]":{
+                        required:"This field is required"
+                    },
+                    "QuestionSet[numQuestion]":{
+                        required:"This field is required"
+                    }
+                }
+            });
+            if(validator.form()){
+                alert("Yes True");
+                return false;
+            }else{
+                alert("No False");
+                return false;
+            }
+        }
+    </script>
+{% endblock %}
     {% block content %}
         <div class="container">
 
@@ -17,6 +53,7 @@
                 sed lobortis sit amet, semper sit amet dolor. Etiam tincidunt rhoncus pharetra.
             </p>
 
+            {#<form action="{{ path('set_question') }}" method="post" autocomplete="off" class="form-question-set" onsubmit="return checkValidation();" id="frmSetTesting">#}
             <form action="{{ path('set_question') }}" method="post" autocomplete="off" class="form-question-set">
                 {#{{ include('B2MainBundle:QuestionType:comparenumber.html.twig') }}#}
                 <input type="hidden" name="QuestionSet[category]" value="{{ category }}" readonly="readonly"/>
@@ -29,11 +66,17 @@
                     <label for="QuestionSet_numSheets">Number of Sheets</label>
                     <input type="text" id="QuestionSet_numSheets" name="QuestionSet[numSheets]" value="{{questionType.numSheets}}"
                            class="form-control"/>
+                    {% if response.errors.numSheets is defined %}
+                        <label class="error" for="QuestionSet_numSheets" generated="true">{{ response.errors.numSheets }}</label>
+                    {% endif %}
                 </div>
                 <div class="form-element">
                     <label for="QuestionSet_numQuestion">Number of Question per Sheet</label>
                     <input type="text" id="QuestionSet_numQuestion" name="QuestionSet[numQuestion]" value="{{questionType.numQuestions}}"
                            class="form-control"/>
+                    {% if response.errors.numQuestions is defined %}
+                        <label class="error" for="QuestionSet_numQuestion" generated="true">{{ response.errors.numQuestions }}</label>
+                    {% endif %}
                 </div>
                 {{ include( 'B2MainBundle:QuestionType:'~ modelName ~'.html.twig') }}
                 <div class="form-element">

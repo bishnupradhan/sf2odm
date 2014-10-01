@@ -1,10 +1,16 @@
 
 <div class="form-element">
     <label for="comparenumber_numberMin">Minimum Number</label>
-<input class="form-control" type="text" id="comparenumber_numberMin" name="comparenumber[numberMin]" value="{{questionType.numberMin}}"/>
+    <input class="form-control" type="text" id="comparenumber_numberMin" name="comparenumber[numberMin]" value="{{questionType.numberMin}}"/>
+    {% if response.errors.numberMin is defined %}
+        <label class="error" for="comparenumber_numberMin" generated="true">{{ response.errors.numberMin }}</label>
+    {% endif %}
 </div>
 <div class="form-element">
-    <label for="QuestionSet_numberMax">Maximum Number</label>
-<input class="form-control" type="text" id="comparenumber_numberMax" name="comparenumber[numberMax]" value="{{questionType.numberMax}}"/>
+    <label for="comparenumber_numberMax">Maximum Number</label>
+    <input class="form-control" type="text" id="comparenumber_numberMax" name="comparenumber[numberMax]" value="{{questionType.numberMax}}"/>
+    {% if response.errors.numberMax is defined %}
+        <label class="error" for="comparenumber_numberMax" generated="true">{{ response.errors.numberMax }}</label>
+    {% endif %}
 </div>
 

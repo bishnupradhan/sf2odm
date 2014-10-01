@@ -2,6 +2,7 @@
 namespace B2\MainBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints as Assert;
 use B2\MainBundle\Document\Question;
 
 /** @ODM\Document(collection="qcomparenumber") */
@@ -12,10 +13,16 @@ class QCompareNumber extends Question
     /** @ODM\Id */
     protected $id;
 
-    /** @ODM\Int */
+    /** @ODM\Int
+     * @Assert\NotBlank()
+     * @Assert\Type(type="Int")
+     */
     protected $numberMin;
 
-    /** @ODM\Int */
+    /** @ODM\Int
+     * @Assert\NotBlank()
+     * @Assert\Type(type="Integer", message="The value {{ value }} is not a valid {{ type }}.")
+     */
     protected $numberMax;
 
 
